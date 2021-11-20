@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Purge page</title>
+    <link rel="stylesheet" href="/css/globalstyles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" ntegrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="/scripts/purge.js"></script>
+</head>
+<body>
+    <div id="main-container">
+        <%- include('partials/header') %>
+        <div id="content">
+            <h1>Purge page</h1>
+            <span id="response"></span>
+            <p>Are you sure you wish to purge the page <span class="highlight"><%= page %></span>?</p>
+            <p>The last build time for this page was <span class="highlight"><%= buildTime %></span> (<span class="highlight"><%= buildTimeRelative %></span> minutes ago).</p>
+            <button id="confirm" data-page="<%= page %>">Confirm</button>
+        </div>
+    </div>
+</body>
+</html>

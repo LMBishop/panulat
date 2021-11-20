@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error: <%= code %></title>
+    <link rel="stylesheet" href="/css/globalstyles.css">
+</head>
+<body>
+    <div id="main-container">
+        <%- include('partials/header') %>
+        <div id="content">
+            <h1>An error occurred (<%= code %>)</h1>
+            <p>Go <a href="/">home</a>?</p>
+        </div>
+    </div>
+</body>
+</html>

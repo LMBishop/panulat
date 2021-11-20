@@ -1,0 +1,19 @@
+{
+  "name": "website",
+  "version": "unpublished",
+  "description": "",
+  "main": "app/index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leonardo Bishop",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "eslint": "^8.2.0"
+  }
+}

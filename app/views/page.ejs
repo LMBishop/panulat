@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/globalstyles.css">
+</head>
+<body>
+    <div id="main-container">
+        <%- include('partials/header') %>
+        <div id="content">
+            <%- content %>
+            <hr>
+            <span class=footer><a href="https://github.com/LMBishop/website">GitHub</a> | Page built: <%= buildTime %> | <a href="/special/purge/<%= path %>">Purge this page</a></span>
+        </div>
+    </div>
+</body>
+</html>
