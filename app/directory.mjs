@@ -35,6 +35,7 @@ export function buildPage(path) {
 
     let page = {
         html: content,
+        raw: data,
         buildTime: result.metadata.buildTime,
         hidden: result.metadata.hidden,
         displayTitle: title

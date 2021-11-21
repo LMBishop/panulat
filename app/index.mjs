@@ -17,6 +17,19 @@ app.use(express.static(__dirname + '/static'));
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
+app.get('/:page.wiki', (req, res) => {
+    let path = req.params.page;
+    let page = directory.pageFor(path);
+
+    if (!page) {
+        error(res, 404);
+        return;
+    }
+
+    res.type('text/plain');
+    res.send(page.raw).end();
+});
+
 app.get('/:page?', (req, res) => {
     let path = req.params.page ?? 'index';
     let page = directory.pageFor(path);
