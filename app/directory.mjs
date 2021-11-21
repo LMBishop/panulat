@@ -31,13 +31,14 @@ export function buildPage(path) {
     }
     let result = parse(data);
     let title = result.metadata.displayTitle ?? 'Unnamed page';
-    let content = `<h1>${title}</h1>${result.html}`;
+    let content = `${result.metadata.notitle ? '' : `<h1>${title}</h1>`}${result.html}`;
 
     let page = {
         html: content,
         raw: data,
         buildTime: result.metadata.buildTime,
-        hidden: result.metadata.hidden,
+        hidden: result.metadata.hidden ?? false,
+        notitle: result.metadata.notitle ?? false,
         displayTitle: title
     };
     pages[path] = page;

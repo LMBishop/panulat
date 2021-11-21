@@ -45,6 +45,7 @@ export function parse(data) {
             .replace(re(r`__FORCETOC__`), () => (metadata.toc = true, ''))
             .replace(re(r`__TOC__`), () => (metadata.toc = true, '<toc></toc>'))
             .replace(re(r`__HIDDEN__`), () => (metadata.hidden = true, ''))
+            .replace(re(r`__NOTITLE__`), () => (metadata.notitle = true, ''))
 
             // Magic words: {{!}}, {{reflist}}, etc
             .replace(re(r`{{ \s* ! \s* }}`), '&vert;')
