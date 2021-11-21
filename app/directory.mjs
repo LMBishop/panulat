@@ -23,7 +23,12 @@ export function pageFor(path) {
 }
 
 export function buildPage(path) {
-    let data = readFileSync(`${PAGES_DIR}/${path}.wiki`, 'utf-8'); 
+    let data;
+    try {
+        data = readFileSync(`${PAGES_DIR}/${path}.wiki`, 'utf-8'); 
+    } catch {
+        return false;
+    }
     let result = parse(data);
     let title = result.metadata.displayTitle ?? 'Unnamed page';
     let content = `<h1>${title}</h1>${result.html}`;
@@ -35,6 +40,7 @@ export function buildPage(path) {
         displayTitle: title
     };
     pages[path] = page;
+    return true;
 }
 
 export function rebuild() {
@@ -67,8 +73,10 @@ export function purge(path) {
             return false;
         } else {
             pages[path] = {};
-            buildPage(path);
-            return true;
+            if (buildPage(path)) {
+                return true;
+            }
+            delete pages[path];
         }
     }
     return false;
