@@ -1,13 +1,11 @@
 'use strict';
 
-import { PAGES_DIR } from './constants.mjs';
+import { PAGES_DIR, PURGE_COOLDOWN_MIN } from './constants.mjs';
 import { parse } from './wikiparser.mjs';
 import { readFileSync, readdirSync } from 'fs';
 
 const pages = {};
 const metadata = {};
-
-const PURGE_COOLDOWN_MIN = 10;
 
 export function pageFor(path) {
     path = path.replace(/[^a-z0-9]/gi, '_').toLowerCase();
