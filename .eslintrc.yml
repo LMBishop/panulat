@@ -18,6 +18,3 @@ rules:
   semi:
     - error
     - always
-ignorePatterns:
-  - 'app/static/*'
-  - 'node_modules/*'
