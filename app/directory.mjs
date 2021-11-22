@@ -37,7 +37,8 @@ export function buildPage(path) {
         html: content,
         raw: data,
         buildTime: result.metadata.buildTime,
-        hidden: result.metadata.hidden ?? false,
+        primary: result.metadata.primary ?? false,
+        sortOrder: result.metadata.sortOrder ?? -1,
         notitle: result.metadata.notitle ?? false,
         displayTitle: title
     };
@@ -57,6 +58,17 @@ export function rebuild() {
         file = file.replace('.wiki', '');
         buildPage(file);
     });
+
+    let primaryPages = [];
+    for (const page of Object.keys(pages)) {
+        if (pages[page].primary) {
+            primaryPages.push(page);
+        }
+    }
+    primaryPages.sort((a, b) => {
+        return a.sortOrder - b.sortOrder;
+    });
+    metadata.navbar = primaryPages;
     metadata.fileTreeBuildTime = new Date();
 }
 
@@ -89,12 +101,12 @@ export function getPages() {
 }
 
 export function getNavbar(current = '') {
-    let navbar  = '';
-    for (const path of Object.keys(pages)) {
-        if (pages[path].hidden) {
-            continue;
-        }
-        navbar = navbar + `<div class="navbar-element"><a href="/${path}"${current == path ? ' class="highlight"' : ''}>${pages[path].displayTitle}</a></div>`;
+    if (!metadata.navbar) {
+        return '';
+    }
+    let navbar = '';
+    for (const page of metadata.navbar) {
+        navbar = navbar + `<div class="navbar-element"><a href="/${page}"${current == page ? ' class="highlight"' : ''}>${pages[page].displayTitle}</a></div>`;
     }
     return navbar;
 }

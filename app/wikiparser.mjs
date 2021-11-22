@@ -40,11 +40,12 @@ export function parse(data) {
 
             // Metadata: displayTitle, __NOTOC__, etc
             .replace(re(r`{{ \s* displayTitle: ([^}]+) }}`), (_, title) => (metadata.displayTitle = title, ''))
+            .replace(re(r`{{ \s* navbarSortOrder: ([^}]+) }}`), (_, order) => (metadata.sortOrder = parseInt(order, 10), ''))
             .replace(re(r`__NOINDEX__`), () => (metadata.noindex = true, ''))
             .replace(re(r`__NOTOC__`), () => (metadata.notoc = true, ''))
             .replace(re(r`__FORCETOC__`), () => (metadata.toc = true, ''))
             .replace(re(r`__TOC__`), () => (metadata.toc = true, '<toc></toc>'))
-            .replace(re(r`__HIDDEN__`), () => (metadata.hidden = true, ''))
+            .replace(re(r`__PRIMARY__`), () => (metadata.primary = true, ''))
             .replace(re(r`__NOTITLE__`), () => (metadata.notitle = true, ''))
 
             // Magic words: {{!}}, {{reflist}}, etc

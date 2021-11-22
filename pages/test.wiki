@@ -1,3 +1,5 @@
+__PRIMARY__
+{{NAVBARSORTORDER:3}}
 {{DISPLAYTITLE:Test page}}
 
 This is a test page
