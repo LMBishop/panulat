@@ -66,7 +66,7 @@ export function rebuild() {
         }
     }
     primaryPages.sort((a, b) => {
-        return a.sortOrder - b.sortOrder;
+        return pages[a].sortOrder - pages[b].sortOrder;
     });
     metadata.navbar = primaryPages;
     metadata.fileTreeBuildTime = new Date();

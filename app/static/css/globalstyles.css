@@ -17,7 +17,13 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #fff;
+    color: #cc7832
+}
+
+.code-block {
+    background-color: #222;
+    border: solid 1px #333;
+    padding: 10px;
 }
 
 #navbar {
@@ -51,7 +57,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .navbar-element > .highlight {
-    color: #ffff87;
+    color: #ffc66d;
 }
 
 #main-container {
@@ -62,17 +68,17 @@ h1, h2, h3, h4, h5, h6 {
 #content {
     padding: 20px;
     max-width: 1200px;
-    background-color: #333;
+    background-color: #2b2b2b;
     margin: 0 auto;
 }
 
 a {
-    color: #ffff87;
+    color: #ffc66d;
     text-decoration: underline;
 }
 
 .highlight {
-    color: #ffff87;
+    color: #ffc66d;
 }
 
 .footer {

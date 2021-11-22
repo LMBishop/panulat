@@ -238,8 +238,8 @@ export function parse(data) {
             )
 
             // Nonstandard: ``code`` and ```code blocks```
-            .replace(re(r` \`\`\` ([^\`]+?) \`\`\` `), '<pre>$1</pre>')
-            .replace(re(r` \`\` ([^\`]+?) \`\` `), '<code>$1</code>')
+            .replace(re(r` \`\`\` ([^\`]+?) \`\`\` `), '<pre class="code-block">$1</pre>')
+            .replace(re(r` <pre> ([^\`]+?) </pre> `), '<pre class="code-block">$1</pre>')
 
             // Spacing
             .replace(/(\r?\n){2}/g, '\n</p><p>\n')
