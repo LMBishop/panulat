@@ -1,6 +1,6 @@
 'use strict';
 
-import { PAGES_DIR, PURGE_COOLDOWN_MIN } from './constants.mjs';
+import { PAGES_DIR, PURGE_COOLDOWN_MIN, REBUILD_COOLDOWN_MIN } from './constants.mjs';
 import { parse } from './wikiparser.mjs';
 import { readFileSync, readdirSync } from 'fs';
 
@@ -22,7 +22,7 @@ export function pageFor(path) {
     return page;
 }
 
-export function buildPage(path) {
+function buildPage(path) {
     let data;
     try {
         data = readFileSync(`${PAGES_DIR}/${path}.wiki`, 'utf-8'); 
@@ -47,6 +47,9 @@ export function buildPage(path) {
 }
 
 export function rebuild() {
+    if (metadata.fileTreeBuildTime + REBUILD_COOLDOWN_MIN * 60 * 1000 > Date.now()) {
+        return false;
+    }
     for (var page in pages) {
         delete pages[page];
     }
@@ -70,6 +73,7 @@ export function rebuild() {
     });
     metadata.navbar = primaryPages;
     metadata.fileTreeBuildTime = new Date();
+    return true;
 }
 
 export function exists(path) {

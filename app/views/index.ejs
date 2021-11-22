@@ -7,8 +7,11 @@
 <body>
     <div id="main-container">
         <%- include('partials/header') %>
-        <div id="content">
-            <%- page %>
+        <div id="content-container">
+            <%- include('partials/navbar') %>
+            <div id="content">
+                <%- page %>
+            </div>
         </div>
     </div>
 </body>

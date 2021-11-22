@@ -88,7 +88,7 @@ app.get('/special/rebuild', (req, res) => {
 });
 
 app.get('/special/rebuild/confirm', (req, res) => {
-    if (directory.rebuild()[0]) {
+    if (directory.rebuild()) {
         res.status(200).send();
     } else {
         res.status(429).send();
