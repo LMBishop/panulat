@@ -1,0 +1,2 @@
+<span>Blog post &bull; {{{date}}}</span><br>
+<hr>

@@ -1,0 +1,14 @@
+__PRIMARY__
+{{NAVBARSORTORDER:3}}
+{{DISPLAYTITLE:Contact}}
+
+You can find me at:
+* GitHub: [https://github.com/LMBishop https://github.com/LMBishop]
+
+You can contact me on:
+* Email: contact (at) leonardobishop.com
+
+== PGP signature ==
+<pre>
+
+</pre>

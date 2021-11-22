@@ -1,0 +1,28 @@
+__NOTITLE__
+__PRIMARY__
+{{NAVBARSORTORDER:1}}
+{{DISPLAYTITLE:Home}}
+Hello! 👋
+
+I'm '''Leonardo Bishop''', a programmer studying Computer Science full-time at university.
+
+You can view my projects on the [[about]] page.
+
+== Accessing old content ==
+
+All traffic to leonardobishop.com is now redirected to this new website. To access old content on here, you should prepend the path with a tilde (~).
+
+For example, the following
+<pre>
+https://leonardobishop.com/nextbus/
+</pre>
+will become
+<pre>
+https://leonardobishop.com/~nextbus/
+</pre>
+
+== New website ==
+
+This new website is built in NodeJS and these pages are witten in wikitext.
+
+The source code for this website is available on [https://github.com/LMBishop/website GitHub], for everyone to rip apart and laugh at how poorly written it is. (If you do have suggestions on how to improve it though, please do let me know!)

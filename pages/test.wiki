@@ -1,5 +1,5 @@
 __PRIMARY__
-{{NAVBARSORTORDER:3}}
+{{NAVBARSORTORDER:4}}
 {{DISPLAYTITLE:Test page}}
 
 This is a test page
