@@ -1,6 +1,8 @@
 'use strict';
 
 import { PARSER_MAX_RECURSION, TEMPLATE_DIR, IMAGES_DIR } from './constants.mjs';
+import dateFormat from 'dateformat';
+import htmlEscape from 'escape-html';
 import * as fs from 'fs';
 
 const re = (regex, flag = 'mgi') => {
