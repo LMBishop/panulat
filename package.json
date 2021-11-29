@@ -4,12 +4,14 @@
   "description": "",
   "main": "app/index.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node -r dotenv/config app/index.mjs"
   },
   "author": "Leonardo Bishop",
   "license": "UNLICENSED",
   "dependencies": {
     "dateformat": "^5.0.2",
+    "dotenv": "^10.0.0",
     "ejs": "^3.1.6",
     "escape-html": "^1.0.3",
     "express": "^4.17.1"
