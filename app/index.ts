@@ -1,38 +1,44 @@
 'use strict';
 
-import { SERVER_PORT } from './constants.mjs';
-import * as directory from './directory.mjs';
+import { PageDirectory, Page, PageMetadata } from './directory.js';
 import express from 'express';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import dotenv from 'dotenv';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+dotenv.config()
 
 const app = express();
+const directory = new PageDirectory(process.env.PAGES_DIR);
 
 directory.rebuild();
 
-app.use(express.static(__dirname + '/static'));
+function navbar(current: string = ''): string {
+    let navbar = '';
+    directory.primaryPages.forEach(page => {
+        navbar += `<div class="navbar-element"><a href="/${page.standardName}"${current == page.standardName ? ' class="highlight"' : ''}>${page.metadata.displayTitle}</a></div>`;
+    })
+    return navbar
+}
+
+app.use(express.static('static'));
 app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views');
+app.set('views', 'views');
 
 app.get('/:page.wiki', (req, res) => {
     let path = req.params.page;
-    let page = directory.pageFor(path);
+    let raw = directory.getRaw(path);
 
-    if (!page) {
+    if (!raw) {
         error(res, 404);
         return;
     }
 
     res.type('text/plain');
-    res.send(page.raw).end();
+    res.send(raw).end();
 });
 
 app.get('/:page?', (req, res) => {
     let path = req.params.page ?? 'index';
-    let page = directory.pageFor(path);
+    let page = directory.get(path);
 
     if (!page) {
         error(res, 404);
@@ -40,17 +46,17 @@ app.get('/:page?', (req, res) => {
     }
 
     res.render('page.ejs', {
-        navbar: directory.getNavbar(path),
+        navbar: navbar(),
         path: path,
         content: page.html,
-        title: page.displayTitle,
-        buildTime: page.buildTime.toString()
+        title: page.metadata.displayTitle,
+        buildTime: new Date(page.buildTime)
     });
 });
 
 app.get('/special/purge/:page?', (req, res) => {
     let path = req.params.page ?? 'index';
-    let page = directory.rawDataFor(path);
+    let page = directory.get(path);
 
     if (!page) {
         error(res, 404);
@@ -58,16 +64,16 @@ app.get('/special/purge/:page?', (req, res) => {
     }
 
     res.render('purge.ejs', {
-        navbar: directory.getNavbar(),
+        navbar: navbar(),
         page: path,
-        buildTime: page.buildTime?.toString() ?? 'never',
-        buildTimeRelative: Math.round((Date.now() - page.buildTime?.getTime()) / 1000 / 60)
+        buildTime: new Date(page.buildTime) ?? 'never',
+        buildTimeRelative: Math.round((Date.now() - page.buildTime) / 1000 / 60)
     });
 });
 
 app.get('/special/purge/:page/confirm', (req, res) => {
     let path = req.params.page;
-    let page = directory.rawDataFor(path);
+    let page = directory.get(path);
 
     if (!page) {
         error(res, 404);
@@ -83,7 +89,7 @@ app.get('/special/purge/:page/confirm', (req, res) => {
 
 app.get('/special/rebuild', (req, res) => {
     res.render('rebuild.ejs', {
-        navbar: directory.getNavbar()
+        navbar: navbar()
     });
 });
 
@@ -95,13 +101,13 @@ app.get('/special/rebuild/confirm', (req, res) => {
     }
 });
 
-app.listen(SERVER_PORT, () => {
-    console.log(`App listening on ${SERVER_PORT}`);
+app.listen(process.env.PORT, () => {
+    console.log(`App listening on ${process.env.PORT}`);
 });
 
 function error(res, code) {
     res.render('error.ejs', {
         code: code,
-        navbar: directory.getNavbar()
+        navbar: navbar()
     });
 }

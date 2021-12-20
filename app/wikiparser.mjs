@@ -18,7 +18,6 @@
 // in an action of contract, negligence or other tortious action, arising out of or in 
 // connection with the use or performance of this software.
 
-import { PARSER_MAX_RECURSION, TEMPLATE_DIR, IMAGES_DIR } from './constants.mjs';
 import dateFormat from 'dateformat';
 import htmlEscape from 'escape-html';
 import * as fs from 'fs';
@@ -40,7 +39,7 @@ export function parse(data) {
 
     let outText = data;
 
-    for (let l = 0, last = ''; l < PARSER_MAX_RECURSION; l++) {
+    for (let l = 0, last = ''; l < parseInt(process.env.PARSER_MAX_RECURSION, 10); l++) {
         if (last === outText) break; last = outText;
 
         outText = outText
@@ -117,7 +116,7 @@ export function parse(data) {
             // Templates: {{template}}
             .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
                 if (/{{/.test(params)) return _;
-                const page = TEMPLATE_DIR + '/' + title.trim().replace(/ /g, '_');
+                const page = 'Template:' + title.trim().replace(/ /g, '_');
 
                 // Retrieve template content
                 let content = '';
@@ -151,7 +150,7 @@ export function parse(data) {
             // Images: [[File:Image.png|options|caption]]
             .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params) => {
                 if (/{{/.test(params)) return _;
-                const path = IMAGES_DIR + '/' + file.trim().replace(/ /g, '_');
+                const path = 'File:' + file.trim().replace(/ /g, '_');
                 let caption = '';
                 let imageData = {};
                 let imageArgs = params.split('|').map((arg) => arg.replace(/"/g, '&quot;'));
