@@ -19,6 +19,13 @@ function navbar(current: string = ''): string {
     return navbar
 }
 
+function error(res, code) {
+    res.render('error.ejs', {
+        code: code,
+        navbar: navbar()
+    });
+}
+
 app.use(express.static('static'));
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -105,9 +112,10 @@ app.listen(process.env.PORT, () => {
     console.log(`App listening on ${process.env.PORT}`);
 });
 
-function error(res, code) {
-    res.render('error.ejs', {
-        code: code,
-        navbar: navbar()
-    });
+const exit = () => {
+    console.info('Exiting application');
+    process.exit(0);
 }
+
+process.on('SIGINT', exit);
+process.on('SIGTERM', exit);
