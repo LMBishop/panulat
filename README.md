@@ -20,3 +20,19 @@ $ tsc && node build/index.js
 ```
 
 The application will be listening on port 3000.
+
+## Caveats
+This website is essentially built like a wiki system, though there are some drawbacks with this compared to actual wiki software, considering this is a highly specific use case of it. In no particular order:
+* re-rendering pages are a pain after edits
+* files are read from <code>/static/image</code> rather than <code>/pages/file</code> (which breaks the point of the entire namespace system)
+* templates can't transclude other templates
+* the Template namespace is the only transcludable namespace
+* code is a bit wack in places
+* I'm never happy with the visual design
+* I don't actually know what to fill this website with
+* I've written this list both on the website itself and in this readme so I will have to update it twice (and will likely forget one of them)
+
+## License
+The **source code** for this project is licensed under the [ISC License](https://github.com/LMBishop/website/blob/master/LICENSE.txt). You can read the full license text in the [LICENSE.txt](https://github.com/LMBishop/website/blob/master/LICENSE.txt) file.
+
+Any media (images, binary files, videos), or any other non-source code in this repository do not fall under this license.
