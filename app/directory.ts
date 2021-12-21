@@ -1,7 +1,5 @@
-'use strict';
-
 import { parse } from './wikiparser.mjs';
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync } from 'fs';
 import glob from 'glob';
 
 export class PageDirectory {
@@ -28,19 +26,19 @@ export class PageDirectory {
         if (this.lastBuild + parseInt(process.env.REBUILD_COOLDOWN_MIN, 10) * 60 * 1000 > Date.now()) {
             return false;
         }
-        for (var page in this.pages) {
+        for (const page in this.pages) {
             delete this.pages[page];
         }
 
-        let pages = glob.sync(`**/*.wiki`, { cwd: this.pagePath })
+        const pages = glob.sync(`**/*.wiki`, { cwd: this.pagePath })
 
         pages.forEach(page => {
             page = page.replace('.wiki', '').replace('/', ':').replace(/[^a-z0-9:]/gi, '_').toLowerCase();
             this.pages[page] = this.buildPage(page);
         });
 
-        let primaryPages = [];
-        Object.entries(this.pages).forEach(([name, page]) => {
+        const primaryPages = [];
+        Object.entries(this.pages).forEach(([_, page]) => {
             if (page.metadata.includeInNavbar) {
                 primaryPages.push(page);
             }
@@ -72,7 +70,7 @@ export class PageDirectory {
      */
     get(name: string): Page {
         name = this.convertNameToStandard(name);
-        let page = this.pages[name];
+        const page = this.pages[name];
         if (!page) {
             return undefined;
         }
@@ -103,7 +101,7 @@ export class PageDirectory {
      */
     purge(name: string): boolean {
         name = this.convertNameToStandard(name);
-        let page = this.pages[name];
+        const page = this.pages[name];
         if (page) {
             if (page.buildTime + parseInt(process.env.PURGE_COOLDOWN_MIN, 10) * 60 * 1000 > Date.now()) {
                 return false;
@@ -150,11 +148,11 @@ export class PageDirectory {
         } catch {
             return undefined;
         }
-        let result = parse(data);
-        let title = result.metadata.displayTitle ?? name
-        let content = `${result.metadata.notitle ? '' : `<h1>${title}</h1>`}${result.html}`;
+        const result = parse(data);
+        const title = result.metadata.displayTitle ?? name
+        const content = `${result.metadata.notitle ? '' : `<h1>${title}</h1>`}${result.html}`;
     
-        let page: Page = {
+        const page: Page = {
             html: content,
             raw: data,
             standardName: name,
@@ -186,13 +184,13 @@ export class PageDirectory {
      * @param name standard name for a page
      */
     private convertStandardToFilePath(name: string): string {
-        let [first, second] = name.split(':');
-        let [title, subpage] = ((second) ? second : first).split('.')
-        let namespace = (second) ? first : undefined
+        const [first, second] = name.split(':');
+        const [title, subpage] = ((second) ? second : first).split('.')
+        const namespace = (second) ? first : undefined
 
         return `${namespace ? `${namespace}/` : ''}${title}${subpage ? `.${subpage}` : ''}.wiki`
     }
-};
+}
 
 export type Page = {
     html: string;

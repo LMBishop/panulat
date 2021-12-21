@@ -1,4 +1,3 @@
-'use strict';
 /*
  * This file is a modified version of Nixinova/Wikity, whose license is given below:
  * Original: https://www.npmjs.com/package/wikity

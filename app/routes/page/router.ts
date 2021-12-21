@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express from 'express';
 import { navbar, page } from '../../middlewares/index.js';
 
 export const router = express.Router({ mergeParams: true });
@@ -7,7 +7,7 @@ router.use('/:page.wiki', page);
 router.use('/:page?', page);
 
 router.get('/:page.wiki', (req, res, next) => {
-    let page = res.locals.page;
+    const page = res.locals.page;
 
     if (!page) {
         next();
@@ -19,7 +19,7 @@ router.get('/:page.wiki', (req, res, next) => {
 });
 
 router.get('/:page?', navbar, (req, res, next) => {
-    let page = res.locals.page;
+    const page = res.locals.page;
 
     if (!page) {
         next();

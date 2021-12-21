@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express from 'express';
 import { navbar, page } from '../../middlewares/index.js';
 
 export const router = express.Router({ mergeParams: true });
@@ -7,7 +7,7 @@ router.use('/special/purge/:page?', page);
 router.use('/special/purge/:page/confirm', page);
 
 router.get('/special/purge/:page?', navbar, (req, res, next) => {
-    let page = res.locals.page;
+    const page = res.locals.page;
 
     if (!page) {
         next();
@@ -23,7 +23,7 @@ router.get('/special/purge/:page?', navbar, (req, res, next) => {
 });
 
 router.get('/special/purge/:page/confirm', (req, res, next) => {
-    let page = res.locals.page;
+    const page = res.locals.page;
 
     if (!page) {
         next();

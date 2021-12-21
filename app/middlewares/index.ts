@@ -8,10 +8,10 @@ export const navbar = ((req, res, next) => {
 });
 
 export const page = ((req, res, next) => {
-    let path = req.params.page ?? 'index';
+    const path = req.params.page ?? 'index';
     res.locals.path = path;
 
-    let page = res.locals.directory.get(path);
+    const page = res.locals.directory.get(path);
 
     if (!page) {
         next();

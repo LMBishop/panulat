@@ -1,6 +1,4 @@
-'use strict';
-
-import { PageDirectory, Page, PageMetadata } from './directory.js';
+import { PageDirectory } from './directory.js';
 import express from 'express';
 import dotenv from 'dotenv';
 import * as page from './routes/page/router.js';
@@ -27,7 +25,7 @@ app.use((req, res, next) => {
 app.use(page.router);
 app.use(special.router);
 
-app.use(navbar, (req, res, next) => {
+app.use(navbar, (req, res) => {
     res.render('error.ejs', {
         code: '404',
         navbar: res.locals.navbarHtml
