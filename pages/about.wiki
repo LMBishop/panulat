@@ -2,4 +2,60 @@ __PRIMARY__
 {{NAVBARSORTORDER:2}}
 {{DISPLAYTITLE:About}}
 
-⏳
+Hello!
+
+I am a student in the United Kingdom studying computer science at university. 
+I mainly enjoy building web services and have some interest in cybersecurity, though most of my programming experience is in Java.
+Most of my public projects have something to do with ''Minecraft'', as it was through that game where I really got into programming and computer science.
+
+I also have an interest in physics, specifically astronomy. Had I not chosen to study computer science, I would have likely studied physics instead.
+
+== Projects ==
+
+Most of my large projects are related to ''Minecraft''. 
+A lot of other projects aren't listed here simply because they aren't significant enough, and/or because I can't waffle on about them for long enough to fill a whole subsection.
+
+
+=== Quests ===
+
+{{sourcecode|[https://github.com/LMBishop/Quests LMBishop/Quests]}} [[File:questcompass2-256.png|right|150px|Quests logo]]
+
+Quests enables ''Minecraft'' server owners to create goals or missions for their players to work towards.
+It is probably one of my largest projects in terms of both how many people use it and the time I've spent working on it.
+As of writing, it is used by approximately 1,200 servers and up to 9,000 players each day. 
+Unfortunately, I lack the time to properly maintain it, but it is still a project which I am mostly pleased with, as it gave me a good bit of experience designing somewhat large Java projects.
+
+The main description page can be found on [https://www.spigotmc.org/resources/23696/ SpigotMC].
+
+=== Next bus ===
+
+Next bus is a small service which returns live bus data based on open telemetry. 
+I wrote it as my nearest bus stop lacked a departure board and I knew that bus timings were openly available online.
+This was one of my first web projects, and while I admit the the front-end is terrible, it was never designed to look pretty or for anyone but myself to use. 
+This project helped me to both learn the basics of how the web works (...and to also stop turning up late to lessons).
+
+While I have no need for it anymore, it is still accessible at [https://leonardobishop.com/~/nextbus/ https://leonardobishop.com/~/nextbus/].
+
+=== This webiste ===
+
+{{sourcecode|[https://github.com/LMBishop/website LMBishop/webste]}}
+This website was written in TypeScript, and it parses pages written in a markup language and renders it as HTML.
+I could've simply written these pages as static HTML, but I hate myself so I decided to over-engineer this solution instead.
+
+There are some caveats with this system though, in no particular order:
+* re-rendering pages are a pain after edits
+* files are read from <code>/static/image</code> rather than <code>/pages/file</code> (which breaks the point of the entire namespace system)
+* templates can't transclude other templates
+* the Template namespace is the only transcludable namespace
+* code is a bit wack in places
+* I'm never happy with the visual design
+* I don't actually know what to fill this website with
+
+=== u/YTLinkerBot ===
+
+{{sourcecode|[https://github.com/LMBishop/ytlinkerbot LMBishop/ytlinkerbot]}}
+
+YTLinkerBot is a small reddit bot which automatically crossposts YouTube links to reddit whenever a creator uploads. 
+This bot was originally written in Java, but it is (mostly) in the process of being re-written with NodeJS.
+This is due to the fact that it constantly hits the YouTube Data API quota, as it works by continously polling YouTube for each registered channel.
+The new recode will use Google's WebSub service, though the challenge comes with having to automatically manage channel subscriptions for a service which anyone can sign up to, and right now I don't have the time to implement this.

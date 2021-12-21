@@ -2,11 +2,26 @@ __NOTITLE__
 __PRIMARY__
 {{NAVBARSORTORDER:1}}
 {{DISPLAYTITLE:Home}}
+<pre style="text-align:center">
+██╗     ███╗   ███╗██████╗ ██╗███████╗██╗  ██╗ ██████╗ ██████╗ 
+██║     ████╗ ████║██╔══██╗██║██╔════╝██║  ██║██╔═══██╗██╔══██╗
+██║     ██╔████╔██║██████╔╝██║███████╗███████║██║   ██║██████╔╝
+██║     ██║╚██╔╝██║██╔══██╗██║╚════██║██╔══██║██║   ██║██╔═══╝ 
+███████╗██║ ╚═╝ ██║██████╔╝██║███████║██║  ██║╚██████╔╝██║     
+╚══════╝╚═╝     ╚═╝╚═════╝ ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     
+</pre>
+
 Hello! 👋
 
-I'm '''Leonardo Bishop''', a programmer studying Computer Science full-time at university.
+I'm '''Leonardo Bishop''', a programmer studying computer science full-time at university.
 
 You can check out my projects on the [[about]] page.
+
+== New website ==
+
+This new website is written in TypeScript and these pages are witten in wikitext.
+
+The source code for this website is available on [https://github.com/LMBishop/website GitHub], freely available under the ISC licence. (If you have suggestions on how to improve it, specifically how the code is designed, please let me know!)
 
 == Accessing old content ==
 
@@ -20,9 +35,3 @@ will become
 <pre>
 https://leonardobishop.com/~/nextbus/
 </pre>
-
-== New website ==
-
-This new website is written in TypeScript and these pages are witten in wikitext.
-
-The source code for this website is available on [https://github.com/LMBishop/website GitHub], freely available under the ISC licence. (If you have suggestions on how to improve it, specifically how the code is designed, please let me know!)

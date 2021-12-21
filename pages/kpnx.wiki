@@ -1,5 +1,5 @@
 <!-- This is a test page, imported from Wikipedia -->
-{{NAVBARSORTORDER:5}}
+<!-- {{NAVBARSORTORDER:5}}
 '''KPNX''', [[virtual channel]] 12 ([[Ultra high frequency|UHF]] [[digital terrestrial television|digital]] channel 18), is an [[NBC]]-[[network affiliate|affiliated]] [[television station]] serving [[Phoenix, Arizona]], United States that is [[city of license|licensed]] to the suburb of [[Mesa, Arizona|Mesa]]. The station is owned by [[McLean, Virginia]]-based [[Tegna Inc.]] KPNX's studios are located at the Republic Media building on [[Van Buren Street (Arizona)|Van Buren Street]] in [[downtown Phoenix]] (which also houses formerly co-owned newspaper ''[[The Arizona Republic]]''), and its transmitter is located atop [[South Mountains (Arizona)|South Mountain]] on the city's south side; it is also broadcast on [[KNAZ-TV]] (channel 2) in [[Flagstaff, Arizona|Flagstaff]], which formerly was a separate NBC affiliate, and a network of [[Low-power broadcasting#Television|low-power]] [[Broadcast relay station#Broadcast translators|translators]] across northern and central Arizona.
 
 Channel 12 was the second TV station on the air in the Phoenix area, starting in 1953. Originally established in Mesa itself, it was acquired by Phoenix radio station [[KTAR (AM)|KTAR (620 AM)]] in 1954 in a maneuver that ended a contest over channel 3 in Phoenix and was co-owned with that outlet for 25 years. It has been owned by Tegna and its predecessor, Gannett, since 1979, when it became KPNX.
@@ -95,4 +95,4 @@ The station's digital signal is [[Multiplex (TV)|multiplexed]]:
 |- style="background-color:#cee0f2"
 ! scope="row" | [[KASW|61.2]]
 | Grit || [[Grit (TV network)|Grit]] (KASW)
-|}
+|} -->

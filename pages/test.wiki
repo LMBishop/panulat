@@ -1,4 +1,3 @@
-__PRIMARY__
 {{NAVBARSORTORDER:4}}
 {{DISPLAYTITLE:Test page}}
 
