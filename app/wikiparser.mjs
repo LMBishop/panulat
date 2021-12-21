@@ -148,46 +148,48 @@ export function parse(directory, data) {
             // Images: [[File:Image.png|options|caption]]
             .replace(re(r`\[\[ (?:File|Image): (.+?) (\|.+?)? \]\]`), (_, file, params) => {
                 if (/{{/.test(params)) return _;
-                const path = 'File:' + file.trim().replace(/ /g, '_');
+                const path = file.trim().replace(/ /g, '_');
                 let caption = '';
                 let imageData = {};
-                let imageArgs = params.split('|').map((arg) => arg.replace(/"/g, '&quot;'));
-                for (const param of imageArgs) {
-                    if (['left', 'right', 'center', 'none'].includes(param)) {
-                        imageData.float = param;
-                    }
-                    if (['baseline', 'sub', 'super', 'top', 'text-bottom', 'middle', 'bottom', 'text-bottom'].includes(param)) {
-                        imageData.align = param;
-                    }
-                    else if (['border', 'frameless', 'frame', 'framed', 'thumb', 'thumbnail'].includes(param)) {
-                        imageData.type = { framed: 'frame', thumbnail: 'thumb' }[param] || param;
-                        if (imageData.type === 'thumb') imageData.hasCaption = true;
-                    }
-                    else if (param.endsWith('px')) {
-                        param.replace(/(?:(\w+)?(x))?(\w+)px/, (_, size1, auto, size2) => {
-                            if (size1) Object.assign(imageData, { width: size1, height: size2 });
-                            else if (auto) Object.assign(imageData, { width: 'auto', height: size2 });
-                            else Object.assign(imageData, { width: size2, height: 'auto' });
-                            return '';
-                        });
-                    }
-                    else if (param.startsWith('upright=')) {
-                        imageData.width = +param.replace('upright=', '') * 300;
-                    }
-                    else if (param.startsWith('link=')) {
-                        imageData.link = param.replace('link=', '');
-                    }
-                    else if (param.startsWith('alt=')) {
-                        imageData.alt = param.replace('alt=', '');
-                    }
-                    else if (param.startsWith('style=')) {
-                        imageData.style = param.replace('style=', '');
-                    }
-                    else if (param.startsWith('class=')) {
-                        imageData.class = param.replace('class=', '');
-                    }
-                    else {
-                        caption = param;
+                let imageArgs = params?.split('|').map((arg) => arg.replace(/"/g, '&quot;'));
+                if (imageArgs) {
+                    for (const param of imageArgs) {
+                        if (['left', 'right', 'center', 'none'].includes(param)) {
+                            imageData.float = param;
+                        }
+                        if (['baseline', 'sub', 'super', 'top', 'text-bottom', 'middle', 'bottom', 'text-bottom'].includes(param)) {
+                            imageData.align = param;
+                        }
+                        else if (['border', 'frameless', 'frame', 'framed', 'thumb', 'thumbnail'].includes(param)) {
+                            imageData.type = { framed: 'frame', thumbnail: 'thumb' }[param] || param;
+                            if (imageData.type === 'thumb') imageData.hasCaption = true;
+                        }
+                        else if (param.endsWith('px')) {
+                            param.replace(/(?:(\w+)?(x))?(\w+)px/, (_, size1, auto, size2) => {
+                                if (size1) Object.assign(imageData, { width: size1, height: size2 });
+                                else if (auto) Object.assign(imageData, { width: 'auto', height: size2 });
+                                else Object.assign(imageData, { width: size2, height: 'auto' });
+                                return '';
+                            });
+                        }
+                        else if (param.startsWith('upright=')) {
+                            imageData.width = +param.replace('upright=', '') * 300;
+                        }
+                        else if (param.startsWith('link=')) {
+                            imageData.link = param.replace('link=', '');
+                        }
+                        else if (param.startsWith('alt=')) {
+                            imageData.alt = param.replace('alt=', '');
+                        }
+                        else if (param.startsWith('style=')) {
+                            imageData.style = param.replace('style=', '');
+                        }
+                        else if (param.startsWith('class=')) {
+                            imageData.class = param.replace('class=', '');
+                        }
+                        else {
+                            caption = param;
+                        }
                     }
                 }
                 let content = `
@@ -196,7 +198,7 @@ export function parse(directory, data) {
                         style="float:${imageData.float || 'none'};vertical-align:${imageData.align || 'unset'};${imageData.style || ''}"
                     >
                         <img
-                            src="${path}"
+                            src="/image/${path}"
                             alt="${imageData.alt || file}"
                             width="${imageData.width || 300}"
                             height="${imageData.height || 300}"
