@@ -29,7 +29,7 @@ const re = (regex, flag = 'mgi') => {
 const r = String.raw;
 const arg = r`\s*([^|}]+?)\s*`;
 
-export function parse(data) {
+export function parse(directory, data) {
     const vars = {};
     const metadata = {};
     let nowikis = [];
@@ -117,19 +117,16 @@ export function parse(data) {
             // Templates: {{template}}
             .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
                 if (/{{/.test(params)) return _;
-                const page = 'Template:' + title.trim().replace(/ /g, '_');
+                const page = title.includes(':') ? title : `Template:${title}`
 
                 // Retrieve template content
-                let content = '';
-                try {
-                    content = fs.readFileSync(page + '.wiki', 'utf8' );
-                }
-                catch {
-                    return `<a class="internal-link redlink" title="${title}" href="${page}">${title}</a>`;
+                let content = directory.get(page);
+                if (!content) {
+                    return `<a class="internal-link redlink" title="${title}" href="${page}">Template:${title}</a>`;
                 }
 
                 // Remove non-template sections
-                content = content
+                content = content.raw
                     .replace(/<noinclude>.*?<\/noinclude>/gs, '')
                     .replace(/.*<(includeonly|onlyinclude)>|<\/(includeonly|onlyinclude)>.*/gs, '');
 

@@ -34,13 +34,27 @@ export class PageDirectory {
 
         pages.forEach(page => {
             page = page.replace('.wiki', '').replace('/', ':').replace(/[^a-z0-9:]/gi, '_').toLowerCase();
-            this.pages[page] = this.buildPage(page);
+            this.pages[page] = {
+                standardName: page,
+                buildTime: 0,
+                metadata: {}
+            }
+        });
+
+        // Build templates first
+        Object.keys(this.pages).forEach(name => {
+            if (name.includes('Template:')) {
+                this.pages[name] = this.buildPage(name);
+            }
         });
 
         const primaryPages = [];
-        Object.entries(this.pages).forEach(([_, page]) => {
-            if (page.metadata.includeInNavbar) {
-                primaryPages.push(page);
+        Object.keys(this.pages).forEach(name => {
+            if (!name.includes('Template:')) {
+                this.pages[name] = this.buildPage(name);
+            }
+            if (this.pages[name].metadata.includeInNavbar) {
+                primaryPages.push(this.pages[name]);
             }
         });
 
@@ -148,7 +162,7 @@ export class PageDirectory {
         } catch {
             return undefined;
         }
-        const result = parse(data);
+        const result = parse(this, data);
         const title = result.metadata.displayTitle ?? name
         const content = `${result.metadata.notitle ? '' : `<h1>${title}</h1>`}${result.html}`;
     
@@ -193,8 +207,8 @@ export class PageDirectory {
 }
 
 export type Page = {
-    html: string;
-    raw: string;
+    html?: string;
+    raw?: string;
     standardName: string,
     buildTime: number;
     metadata: PageMetadata;
