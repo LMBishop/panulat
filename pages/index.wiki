@@ -6,7 +6,7 @@ Hello! 👋
 
 I'm '''Leonardo Bishop''', a programmer studying Computer Science full-time at university.
 
-You can view my projects on the [[about]] page.
+You can check out my projects on the [[about]] page.
 
 == Accessing old content ==
 
@@ -18,11 +18,11 @@ https://leonardobishop.com/nextbus/
 </pre>
 will become
 <pre>
-https://leonardobishop.com/~nextbus/
+https://leonardobishop.com/~/nextbus/
 </pre>
 
 == New website ==
 
-This new website is built in NodeJS and these pages are witten in wikitext.
+This new website is written in TypeScript and these pages are witten in wikitext.
 
-The source code for this website is available on [https://github.com/LMBishop/website GitHub], for everyone to rip apart and laugh at how poorly written it is. (If you do have suggestions on how to improve it though, please do let me know!)
+The source code for this website is available on [https://github.com/LMBishop/website GitHub], freely available under the ISC licence. (If you have suggestions on how to improve it, specifically how the code is designed, please let me know!)
