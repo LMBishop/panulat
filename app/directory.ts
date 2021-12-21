@@ -151,7 +151,7 @@ export class PageDirectory {
             return undefined;
         }
         let result = parse(data);
-        let title = result.metadata.displayTitle ?? name;
+        let title = result.metadata.displayTitle ?? name
         let content = `${result.metadata.notitle ? '' : `<h1>${title}</h1>`}${result.html}`;
     
         let page: Page = {
