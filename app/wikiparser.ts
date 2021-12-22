@@ -21,6 +21,7 @@
  */
 import dateFormat from 'dateformat';
 import htmlEscape from 'escape-html';
+import { PageDirectory } from './directory';
 
 export class Result {
     public html: string;
@@ -81,7 +82,7 @@ export function findDependencies(data: string): Set<string> {
     return pages;
 }
 
-export function parse(directory, data): Result {
+export function parse(directory: PageDirectory, data: string): Result {
     const vars = {};
     const metadata: any = {};
     const nowikis = [];
@@ -173,13 +174,13 @@ export function parse(directory, data): Result {
                 const page = title.includes(':') ? title : `Template:${title}`
 
                 // Retrieve template content
-                let content = directory.get(page);
+                const content = directory.get(page);
                 if (!content?.html) {
                     return `<a class="internal-link redlink" title="${title}" href="/${page}">Template:${title}</a>`;
                 }
 
                 // Remove non-template sections
-                content = content.raw
+                let raw = content.raw
                     .replace(/<noinclude>.*?<\/noinclude>/gs, '')
                     .replace(/.*<(includeonly|onlyinclude)>|<\/(includeonly|onlyinclude)>.*/gs, '');
 
@@ -189,13 +190,13 @@ export function parse(directory, data): Result {
                 for (const i in args) {
                     const parts = args[i].split('=');
                     const [arg, val] = parts[1] ? [parts[0], ...parts.slice(1)] : [(+i + 1) + '', parts[0]];
-                    content = content.replace(argMatch(arg), (_, m) => val || m || '');
+                    raw = raw.replace(argMatch(arg), (_, m) => val || m || '');
                 }
                 for (let i = 1; i <= 10; i++) {
-                    content = content.replace(argMatch(arg), '$2');
+                    raw = raw.replace(argMatch(arg), '$2');
                 }
 
-                return content;
+                return raw;
             })
 
             // Images: [[File:Image.png|options|caption]]
