@@ -164,6 +164,10 @@ export class PageDirectory {
         const primaryPages = [];
         Object.keys(this.pages).forEach(name => {
             recursiveBulld(this.pages, this.pages[name], this, buildPage);
+
+            if (this.pages[name].metadata.includeInNavbar) {
+                primaryPages.push(this.pages[name]);
+            }
         });
 
         // Sort primary pages
