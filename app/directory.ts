@@ -1,4 +1,4 @@
-import { parse } from './wikiparser.mjs';
+import { parse } from './wikiparser.js';
 import { readFileSync } from 'fs';
 import glob from 'glob';
 

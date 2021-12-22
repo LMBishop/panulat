@@ -21,7 +21,16 @@
  */
 import dateFormat from 'dateformat';
 import htmlEscape from 'escape-html';
-import * as fs from 'fs';
+
+export class Result {
+    public html: string;
+    public metadata: any;
+
+    constructor(html: string, metadata: any) {
+        this.html = html;
+        this.metadata = metadata;
+    }
+}
 
 const re = (regex, flag = 'mgi') => {
     return RegExp(regex.replace(/ /g, '').replace(/\|\|.+?\|\|/g, ''), flag);
@@ -29,14 +38,15 @@ const re = (regex, flag = 'mgi') => {
 const r = String.raw;
 const arg = r`\s*([^|}]+?)\s*`;
 
-export function parse(directory, data) {
+export function parse(directory, data): Result {
     const vars = {};
-    const metadata = {};
-    let nowikis = [];
+    const metadata: any = {};
+    const nowikis = [];
+    const refs = [];
+
     let nowikiCount = 0;
     let rawExtLinkCount = 0;
     let refCount = 0;
-    let refs = [];
 
     let outText = data;
 
@@ -132,10 +142,10 @@ export function parse(directory, data) {
 
                 // Substitite arguments
                 const argMatch = (arg) => re(r`{{{ \s* ${arg} (?:\|([^}]*))? \s* }}}`);
-                let args = params.split('|').slice(1);
-                for (let i in args) {
-                    let parts = args[i].split('=');
-                    let [arg, val] = parts[1] ? [parts[0], ...parts.slice(1)] : [(+i + 1) + '', parts[0]];
+                const args = params.split('|').slice(1);
+                for (const i in args) {
+                    const parts = args[i].split('=');
+                    const [arg, val] = parts[1] ? [parts[0], ...parts.slice(1)] : [(+i + 1) + '', parts[0]];
                     content = content.replace(argMatch(arg), (_, m) => val || m || '');
                 }
                 for (let i = 1; i <= 10; i++) {
@@ -150,8 +160,8 @@ export function parse(directory, data) {
                 if (/{{/.test(params)) return _;
                 const path = file.trim().replace(/ /g, '_');
                 let caption = '';
-                let imageData = {};
-                let imageArgs = params?.split('|').map((arg) => arg.replace(/"/g, '&quot;'));
+                const imageData: any = {};
+                const imageArgs = params?.split('|').map((arg) => arg.replace(/"/g, '&quot;'));
                 if (imageArgs) {
                     for (const param of imageArgs) {
                         if (['left', 'right', 'center', 'none'].includes(param)) {
@@ -268,8 +278,6 @@ export function parse(directory, data) {
     }
     metadata.buildTime = new Date();
 
-    let result = {};
-    result.html = outText;
-    result.metadata = metadata;
+    const result = new Result(outText, metadata);
     return result;
 }
