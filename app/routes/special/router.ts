@@ -1,5 +1,6 @@
 import express from 'express';
 import { navbar, page } from '../../middlewares/index.js';
+import { logger } from './../../logger.js'
 
 export const router = express.Router({ mergeParams: true });
 
@@ -30,6 +31,7 @@ router.get('/special/purge/:page/confirm', (req, res, next) => {
         return;
     }
 
+    logger.info(`Purge for page ${page.standardName} requested by ${req.headers['x-forwarded-for'] || req.socket.remoteAddress }`)
     if (res.locals.directory.purge(res.locals.path)) {
         res.status(200).send();
     } else {
@@ -44,6 +46,7 @@ router.get('/special/rebuild', navbar, (req, res) => {
 });
 
 router.get('/special/rebuild/confirm', (req, res) => {
+    logger.info(`Directory rebuild requested by ${req.headers['x-forwarded-for'] || req.socket.remoteAddress }`)
     if (res.locals.directory.rebuild()) {
         res.status(200).send();
     } else {

@@ -4,13 +4,12 @@ import dotenv from 'dotenv-defaults';
 import * as page from './routes/page/router.js';
 import * as special from './routes/special/router.js';
 import { navbar } from './middlewares/index.js'
+import { logger } from './logger.js'
 
 dotenv.config()
 
 const app = express();
 const directory = new PageDirectory(process.env.PAGES_DIR);
-
-directory.rebuild();
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -33,11 +32,11 @@ app.use(navbar, (req, res) => {
 });
 
 const server = app.listen(process.env.PORT, () => {
-    console.log(`App listening on port ${process.env.PORT}`);
+    logger.info(`App listening on port ${process.env.PORT}`);
 });
 
 const exit = () => {
-    console.info('Stopping server...');
+    logger.info('Stopping server...');
     server.close(() => {
         process.exit(0);
     })

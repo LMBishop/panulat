@@ -26,11 +26,26 @@ router.get('/:page?', navbar, (req, res, next) => {
         return;
     } 
 
+    let html: string;
+    let title: string;
+
+    if (page.metadata.errors.length != 0) {
+        html = '<div class="box-red">This page could not be built due to the following errors:<br><ul>'
+        page.metadata.errors.forEach(e => {
+            html += `<li>${e.identifier}: ${e.message}</li>`
+        });
+        html += '</ul>Go <a href="/">home</a>?</div>'
+        title = 'Page error'
+    } else {
+        html = page.html;
+        title = page.metadata.displayTitle;
+    }
+
     res.render('page.ejs', {
         navbar: res.locals.navbarHtml,
         path: res.locals.path,
-        content: page.html,
-        title: page.metadata.displayTitle,
+        content: html,
+        title: title,
         buildTime: new Date(page.buildTime)
     });
 });

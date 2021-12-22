@@ -38,6 +38,49 @@ const re = (regex, flag = 'mgi') => {
 const r = String.raw;
 const arg = r`\s*([^|}]+?)\s*`;
 
+export function findDependencies(data: string): Set<string> {
+    const pages = new Set<string>();
+
+    let outText = data;
+    for (let l = 0, last = ''; l < parseInt(process.env.PARSER_MAX_RECURSION, 10); l++) {
+        if (last === outText) break; last = outText;
+
+        outText = outText
+            // Remove non-template magic words
+            .replace(re(r`<(/?) \s* (?= script|link|meta|iframe|frameset|object|embed|applet|form|input|button|textarea )`), '&lt;$1')
+            .replace(re(r`(?<= <[^>]+ ) (\bon(\w+))`), 'data-$2')
+            .replace(/<!--[^]+?-->/g, '')
+            .replace(re(r`{{ \s* displayTitle: ([^}]+) }}`), '')
+            .replace(re(r`{{ \s* navbarSortOrder: ([^}]+) }}`), '')
+            .replace(re(r`{{ \s* ! \s* }}`), '&vert;')
+            .replace(re(r`{{ \s* = \s* }}`), '&equals;')
+            .replace(re(r`{{ \s* [Rr]eflist \s* }}`), '<references/>')
+            .replace(re(r`{{ \s* #? urlencode: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? urldecode: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? lc: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? uc: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? lcfirst: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? ucfirst: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? len: ${arg} }}`), '')
+            .replace(re(r`{{ \s* #? pos: ${arg} \|${arg} (?: \s*\|${arg} )? }}`), '')
+            .replace(re(r`{{ \s* #? sub: ${arg} \|${arg} (?:\|${arg})? }}`), '')
+            .replace(re(r`{{ \s* #? padleft: ${arg} \|${arg} \|${arg} }}`), '')
+            .replace(re(r`{{ \s* #? padright: ${arg} \|${arg} \|${arg} }}`), '')
+            .replace(re(r`{{ \s* #? replace: ${arg} \|${arg} \|${arg} }}`), '')
+            .replace(re(r`{{ \s* #? explode: ${arg} \|${arg} \|${arg} }}`), '')
+            .replace(re(r`{{ \s* (#\w+) \s* : \s* ( [^{}]+ ) \s* }}  ( ?!} )`), '')
+
+            // Templates: {{template}}
+            .replace(re(r`{{ \s* ([^#}|]+?) (\|[^}]+)? }} (?!})`), (_, title, params = '') => {
+                if (/{{/.test(params)) return _;
+                const page = title.includes(':') ? title : `Template:${title}`
+                pages.add(page);
+                return '';
+            })
+    }
+    return pages;
+}
+
 export function parse(directory, data): Result {
     const vars = {};
     const metadata: any = {};
@@ -131,8 +174,8 @@ export function parse(directory, data): Result {
 
                 // Retrieve template content
                 let content = directory.get(page);
-                if (!content) {
-                    return `<a class="internal-link redlink" title="${title}" href="${page}">Template:${title}</a>`;
+                if (!content?.html) {
+                    return `<a class="internal-link redlink" title="${title}" href="/${page}">Template:${title}</a>`;
                 }
 
                 // Remove non-template sections

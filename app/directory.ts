@@ -1,9 +1,9 @@
-import { parse } from './wikiparser.js';
+import * as parser from './wikiparser.js';
 import { readFileSync } from 'fs';
 import glob from 'glob';
+import { logger } from './logger.js'
 
 export class PageDirectory {
-
     pages: Record<string, Page>;
     primaryPages: Page[];
     pagePath: string;
@@ -33,28 +33,74 @@ export class PageDirectory {
         const pages = glob.sync(`**/*.wiki`, { cwd: this.pagePath })
 
         pages.forEach(page => {
-            page = page.replace('.wiki', '').replace('/', ':').replace(/[^a-z0-9:]/gi, '_').toLowerCase();
+            page = this.convertNameToStandard(page.replace('.wiki', '').replace('/', ':'));
             this.pages[page] = {
                 standardName: page,
+                raw: this.loadRaw(page),
                 buildTime: 0,
-                metadata: {}
+                metadata: {
+                    dependencies: [],
+                    dependents: [],
+                    errors: []
+                }
             }
         });
 
-        // Build templates first
-        Object.keys(this.pages).forEach(name => {
-            if (name.includes('Template:')) {
-                this.pages[name] = this.buildPage(name);
+        const dependencyGraph: Record<string, string[]>  = {};
+
+        Object.keys(this.pages).forEach(name => dependencyGraph[name] = Array.from(parser.findDependencies(this.pages[name].raw)).map(e => this.convertNameToStandard(e)));
+
+        function traverse(dependents: string[], dependencies: string[], recursionCount: number) {
+            if (recursionCount > parseInt(process.env.PARSER_MAX_RECURSION, 10)) {
+                throw new RecursionError('max recursion reached');
             }
+            dependencies?.forEach((dependency: string) => {
+                if (dependencyGraph[dependency]?.length != 0) {
+                    dependents.forEach((dependent: string) => {
+                        if (dependencyGraph[dependency]?.includes(dependent)) {
+                            throw new DependencyError(`circular dependency between ${dependent} and ${dependency}`, [dependent, dependency]);
+                        }
+                    });
+                    traverse([...dependents, dependency], dependencyGraph[dependency], recursionCount + 1);
+                }
+            });
+        }
+
+        Object.keys(dependencyGraph).forEach(name => { 
+            dependencyGraph[name].forEach(dependency => {
+                try {
+                    traverse([name, dependency], dependencyGraph[dependency], 1);
+                } catch (e) {
+                    if (e instanceof RecursionError) {
+                        this.pages[name].metadata.errors.push({
+                            identifier: 'max-recursion-reached', 
+                            message: `maximum dependency depth of ${process.env.PARSER_MAX_RECURSION} reached`
+                        })
+                        logger.warn(`max recursion for ${name} reached`)
+                    } else if (e instanceof DependencyError) {
+                        if (e.pages.includes(name)) {
+                            this.pages[name].metadata.errors.push({
+                                identifier: 'circular-dependency', 
+                                message: e.message
+                            })
+                            logger.warn(`${e.pages[0]} has a circular dependency with ${e.pages[1]}`)
+                        } else {
+                            logger.warn(`transclusions on page ${name} may not resolve due to dependency errors in its dependency tree`)
+                        }
+                    } else {
+                        throw e;
+                    }
+                }
+            });
         });
 
         const primaryPages = [];
         Object.keys(this.pages).forEach(name => {
-            if (!name.includes('Template:')) {
+            if (this.pages[name].metadata.errors.length == 0) {
                 this.pages[name] = this.buildPage(name);
-            }
-            if (this.pages[name].metadata.includeInNavbar) {
-                primaryPages.push(this.pages[name]);
+                if (this.pages[name].metadata.includeInNavbar) {
+                    primaryPages.push(this.pages[name]);
+                }
             }
         });
 
@@ -88,11 +134,7 @@ export class PageDirectory {
         if (!page) {
             return undefined;
         }
-    
-        if (!page.html) {
-            return this.buildPage(name)
-        }
-    
+
         return page;
     }
 
@@ -147,6 +189,17 @@ export class PageDirectory {
     getPrimaryPages(): Page[] {
         return this.primaryPages;
     }
+
+    private loadRaw(name: string): string {
+        name = this.convertNameToStandard(name);
+        let data: string;
+        try {
+            data = readFileSync(`${this.pagePath}/${this.convertStandardToFilePath(name)}`, 'utf-8'); 
+        } catch {
+            return undefined;
+        }
+        return data;
+    }
     
     /**
      * Build a page.
@@ -157,12 +210,13 @@ export class PageDirectory {
     private buildPage(name: string): Page {
         name = this.convertNameToStandard(name);
         let data: string;
-        try {
-            data = readFileSync(`${this.pagePath}/${this.convertStandardToFilePath(name)}`, 'utf-8'); 
-        } catch {
-            return undefined;
+        if (this.pages[name]?.raw) {
+            data = this.pages[name]?.raw
+        } else {
+            data = this.loadRaw(name)
         }
-        const result = parse(this, data);
+
+        const result = parser.parse(this, data);
         const title = result.metadata.displayTitle ?? name
         const content = `${result.metadata.notitle ? '' : `<h1>${title}</h1>`}${result.html}`;
     
@@ -175,7 +229,10 @@ export class PageDirectory {
                 includeInNavbar: result.metadata.primary ?? false,
                 sortOrder: result.metadata.sortOrder ?? -1,
                 showTitle: !result.metadata.notitle ?? true,
-                displayTitle: title
+                displayTitle: title,
+                dependencies: [],
+                dependents: [],
+                errors: []
             }
         };
         this.pages[name] = page;
@@ -189,7 +246,11 @@ export class PageDirectory {
      * @param name non-standard name for a page
      */
     private convertNameToStandard(name: string): string {
-        return name.replace(/[^a-z0-9:]/gi, '_').toLowerCase();
+        name = name.replace(/[^a-z0-9:]/gi, '_').toLowerCase();
+        if (!name.includes(':')) {
+            name = `main:${name}`;
+        }
+        return name;
     }
 
     /**
@@ -198,7 +259,7 @@ export class PageDirectory {
      * @param name standard name for a page
      */
     private convertStandardToFilePath(name: string): string {
-        const [first, second] = name.split(':');
+        const [first, second] = name.replace('main:', '').split(':');
         const [title, subpage] = ((second) ? second : first).split('.')
         const namespace = (second) ? first : undefined
 
@@ -209,7 +270,7 @@ export class PageDirectory {
 export type Page = {
     html?: string;
     raw?: string;
-    standardName: string,
+    standardName: string;
     buildTime: number;
     metadata: PageMetadata;
 };
@@ -219,4 +280,31 @@ export type PageMetadata = {
     sortOrder?: number;
     showTitle?: boolean;
     includeInNavbar?: boolean;
+    dependencies: string[];
+    dependents: string[];
+    errors: PageError[];
 };
+
+export type PageError = {
+    identifier: string;
+    message: string;
+}
+
+export class DependencyError extends Error {
+    pages: string[]
+
+    constructor(message: string, pages: string[]) {
+        super(message);
+        this.pages = pages;
+
+        Object.setPrototypeOf(this, DependencyError.prototype);
+    }
+}
+
+export class RecursionError extends Error {
+    constructor(message: string) {
+        super(message);
+
+        Object.setPrototypeOf(this, RecursionError.prototype);
+    }
+}
