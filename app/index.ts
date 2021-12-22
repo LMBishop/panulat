@@ -1,6 +1,6 @@
 import { PageDirectory } from './directory.js';
 import express from 'express';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv-defaults';
 import * as page from './routes/page/router.js';
 import * as special from './routes/special/router.js';
 import { navbar } from './middlewares/index.js'
