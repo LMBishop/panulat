@@ -105,3 +105,9 @@ a {
     padding: 10px;
     background-color: rgba(255, 0, 0, 0.2);
 }
+
+table, th, td {
+	border: 1px solid rgb(200, 200, 200);
+	border-collapse: collapse;
+	padding: 10px;
+}

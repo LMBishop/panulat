@@ -39,6 +39,30 @@ router.get('/special/purge/:page/confirm', (req, res, next) => {
     }
 });
 
+router.use('/special/info/:page?', page);
+
+router.get('/special/info/:page?', navbar, (req, res, next) => {
+    const page = res.locals.page;
+
+    if (!page) {
+        next();
+        return;
+    }
+
+    res.render('pageinfo.ejs', {
+        navbar: res.locals.navbarHtml,
+        standardName: page.standardName,
+        displayTitle: page.metadata.displayTitle,
+        buildTime: page.buildTime,
+        primary: page.metadata.includeInNavbar,
+        showTitle: page.metadata.showTitle,
+        sortOrder: page.metadata.sortOrder,
+        dependencies: page.metadata.dependencies,
+        dependents: page.metadata.dependents,
+        errors: page.metadata.errors,
+    });
+});
+
 router.get('/special/rebuild', navbar, (req, res) => {
     res.render('rebuild.ejs', {
         navbar: res.locals.navbarHtml
