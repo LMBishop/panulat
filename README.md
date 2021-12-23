@@ -25,8 +25,9 @@ The application will be listening on port 3000.
 This website is essentially built like a wiki system, though there are some drawbacks with this compared to actual wiki software, considering this is a highly specific use case of it. In no particular order:
 * re-rendering pages are a pain after edits
 * files are read from <code>/static/image</code> rather than <code>/pages/file</code> (which breaks the point of the entire namespace system)
-* templates can't transclude other templates
-* the Template namespace is the only transcludable namespace
+* ~~templates can't transclude other templates~~ (✅ fixed [144fec4](https://github.com/LMBishop/website/commit/144fec46aff02621d53fa1a101d879adaaf6126d))
+* ~~the Template namespace is the only transcludable namespace~~ (✅ fixed [144fec4](https://github.com/LMBishop/website/commit/144fec46aff02621d53fa1a101d879adaaf6126d))
+* ~~circular dependencies cause infinite recursion~~ (✅ fixed [951984f](https://github.com/LMBishop/website/commit/951984fb55d552d9c816a30069e2321f3602d305))
 * code is a bit wack in places
 * I'm never happy with the visual design
 * I don't actually know what to fill this website with
