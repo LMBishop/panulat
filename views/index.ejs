@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/globalstyles.css">
+    <%- include('partials/head') %>
 </head>
 <body>
     <div id="main-container">
-        <%- include('partials/header') %>
+        <%- include('partials/navbar') %>
         <div id="content-container">
-            <%- include('partials/navbar') %>
             <div id="content">
-                <%- page %>
+                <%- content %>
             </div>
         </div>
     </div>

@@ -1,9 +1,0 @@
-{{NAVBARSORTORDER:4}}
-{{DISPLAYTITLE:Test page}}
-
-This is a test page
-* somewhere
-* somewhere else
-
-== Heading ==
-Content

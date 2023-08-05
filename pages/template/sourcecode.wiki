@@ -1,1 +1,0 @@
-: <small>''Source code available at {{{1}}}''</small>

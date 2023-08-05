@@ -2,7 +2,7 @@
     "compilerOptions": {
       "outDir": "./build",
       "allowJs": true,
-      "target": "es5",
+      "target": "es2020",
       "module": "es2020",
       "moduleResolution": "node",
       "allowSyntheticDefaultImports": true,

@@ -1,0 +1,14 @@
+<title>Leonardo Bishop</title>
+<link rel="stylesheet" href="/css/globalstyles.css">
+
+<% if (typeof stylesheets == 'object') { %>
+    <% for (const sheet of stylesheets) { %>
+<link rel="stylesheet" href="<%= sheet %>">
+    <% } %>
+<% } %>
+
+<% if (typeof scripts == 'object') { %>
+    <% for (const script of scripts) { %>
+<script src="<%= script %>"></script>
+    <% } %>
+<% } %>

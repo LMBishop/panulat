@@ -1,18 +1,11 @@
-export const navbar = ((req, res, next) => {
-    let navbar = '';
-    res.locals.directory.primaryPages.forEach(page => {
-        navbar += `<div class="navbar-element"><a href="/${page.standardName}"${(req.params.page ?? '' )== page.standardName ? ' class="highlight"' : ''}>${page.metadata.displayTitle}</a></div>`;
-    })
-    res.locals.navbarHtml = navbar;
-    next();
-});
+import { PageDirectory } from "../pages.js";
 
 export const page = ((req, res, next) => {
-    const path = req.params.page ?? 'index';
+    const path = req.originalUrl == "/" ? 'index' : req.originalUrl.substring(1);
     res.locals.path = path;
 
-    const page = res.locals.directory.get(path);
-
+    const page = PageDirectory.get(path);
+    
     if (!page) {
         next();
         return;

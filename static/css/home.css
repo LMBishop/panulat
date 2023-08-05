@@ -1,0 +1,27 @@
+.grid-outer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+}
+
+.grid-inner {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.grid-title {
+    flex-basis: 50px;
+    font-family: var(--font-monospace);
+    color: var(--color-text-muted);
+    text-align: right;
+}
+
+.grid-content {
+    width: 100%
+}
+
+.spacer {
+    height: 3rem;
+}

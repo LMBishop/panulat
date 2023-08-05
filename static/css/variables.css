@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Chivo:wght@200&family=Hind&family=Noto+Sans&display=swap');
+
+@font-face {
+    font-family: 'Iosevka Web';
+    src: url(/fonts/iosevka-medium.woff2) format('woff2');
+    font-stretch: condensed;
+    font-display: swap;
+}
+
+:root {
+    --font-sans-serif: 'Hind', 'Noto Sans', 'Segoe UI', 'Chivo', sans-serif;
+    --font-monospace: 'Iosevka Web', monospace;
+    
+    --color-background: #111;
+    --color-text: #ddd;
+    --color-text-muted: #aaa;
+    --color-text-link: #ff851b;
+    --color-text-link-bg: rgba(255, 133, 27, 0.2);
+
+    --color-scrollbar: rgba(255, 255, 255, 0.4);
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/blog.css">
+</head>
+<body>
+    <div id="main-container">
+        <%- include('partials/navbar') %>
+        <div id="content-container">
+        <% if (index) { %>
+            <div id="content">
+                <h1>Blog</h1>
+                    <div class="blog-post-header">
+                        <span class="blog-post-title monospace">title</span>
+                        <span class="monospace">date</span>
+                    </div>
+                <% for (const blog of blogs) { %>
+                    <a class="blog-post" href="/<%= blog.route %>">
+                        <span class="blog-post-title">
+                            <%= blog.metadata.title %>
+                        </span>
+                        <span class="blog-post-date monospace">
+                            <%= blog.metadata.date?.toISOString().substring(0, 10) %>
+                        </span>
+                    </a>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div id="content">
+                <div id="back-container">
+                    <div id="back-header">
+                        <a href="/blog" class="monospace">&larr; blog posts</a>
+                    </div>
+                </div>
+                <div id="title" class="monospace">
+                    <h1><%= page.metadata.title %></h1>
+                    <span><%= page.metadata.date?.toDateString() %></span>
+                </div>
+                <%- page.html %>
+                <div id="back-footer">
+                    <a href="/blog" class="monospace">&larr; blog posts</a>
+                </div>
+            </div>
+        <% } %>
+        </div>
+    </div>
+</body>
+</html>
