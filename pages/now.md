@@ -12,5 +12,9 @@ after the end of semester, and before my year long placement.
 
 <br>
 
-*I update this page every so often with what I'm up to. Its contents are 
-ephemeral, I do not keep a log of them.*
+<p class="small">
+<em>
+    I update this page every so often with what I'm up to. Its contents are 
+    ephemeral, I do not keep a log of them.
+</em>
+</p>
