@@ -48,6 +48,7 @@ const setDefaultData = () => {
     songAlbumArt.src = '/images/blank-album-cover.png';
 
     setProgress(0, 0);
+    setOpenInSpotify(null);
 }
 
 const setOpenInSpotify = (songUrl) => {
@@ -87,6 +88,10 @@ const connectWebsocket = () => {
         progressMillis = data.progress;
         durationMillis = data.duration;
         
+        if (!data.title) {
+            setDefaultData();
+            return;
+        }
         songTitle.innerHTML = data.title;
         songArtist.innerHTML = data.artist;
         songAlbum.innerHTML = data.album;
