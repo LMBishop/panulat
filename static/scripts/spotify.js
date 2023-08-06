@@ -2,7 +2,7 @@ const connectedColor = '#2ECC40';
 const connectingColor = '#FF851B';
 const disconnectedColor = '#FF4136';
 
-const websocketUrl = 'ws://wailt.leonardobishop.com/';
+const websocketUrl = 'wss://wailt.leonardobishop.com/';
 
 let progressMillis;
 let durationMillis;
