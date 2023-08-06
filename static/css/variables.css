@@ -16,6 +16,9 @@
     --color-text-muted: #aaa;
     --color-text-link: #ff851b;
     --color-text-link-bg: rgba(255, 133, 27, 0.2);
+    
+    --color-soft-outline: rgba(255, 255, 255, 0.2);
+    --color-soft-fill: rgba(255, 255, 255, 0.05);
 
     --color-scrollbar: rgba(255, 255, 255, 0.4);
 }

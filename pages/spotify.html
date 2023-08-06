@@ -1,21 +1,41 @@
 ---
+stylesheets:
+ - /css/spotify.css
 scripts:
  - /scripts/spotify.js
 ---
 <h1>Spotify</h1>
-<b>
-    This is a work in progress once I figure out Spotify's tedious 
-    authentication flow.
-</b>
-<div id="music-player">
-    <span id="song-title"></span>
-    <span id="song-artist"></span>
-    <span id="song-album"></span>
+<div id="music-player" class="monospace">
+    <img id="song-album-art" src=""></img>
+    <div id="track">
+        <span id="song-title"></span>
+        <div>
+            <span id="song-artist"></span> - <span id="song-album"></span>
+        </div>
+        <div id="song-progress-bar">
+            <span id="song-progress"></span>
+            <div id="song-progress-bar-fill">
+                <div id="song-progress-bar-background"></div>
+                <div id="song-progress-bar-thumb"></div>
+            </div>
+            <span id="song-duration"></span>
+        </div>
+    </div>
     <br>
-    <span id="connection-status"></span>
 </div>
-<br>
+<div id="metadata" class="monospace small">
+    <div id="connection-status">
+        <div id="connection-status-indicator"></div>
+        <span id="connection-status-text">Disconnected</span>
+    </div>
+    <a id="open-in-spotify" target="_blank" href="#">
+        Open in Spotify
+    </a>
+</div>
+<p class="small">
 <em>
     This page shows what I'm currently listening to on Spotify.
-    It requires JavaScript to work.
+    It requires JavaScript to work, and was inspired by 
+    <a href="https://joinmymusic.com/">ssamjh's Music Sync</a>.
 </em>
+</p>

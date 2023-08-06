@@ -10,6 +10,10 @@ html, body {
     font-family: var(--font-sans-serif);
 }
 
+.small {
+    font-size: 0.8rem;
+}
+
 #main-container {
     display: flex;
     flex-direction: row;
