@@ -5,5 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    volumes:
+      - .env:/app/.env:ro
+      - ./pages:/app/pages:ro
+      - ./static:/app/static:ro
+      - ./views:/app/views:ro
     restart: unless-stopped
 

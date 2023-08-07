@@ -1,17 +1,29 @@
-FROM node:alpine
+FROM node:alpine AS build
 
-WORKDIR /srv/node/app
+WORKDIR /app
 
-COPY package*.json ./
+COPY --chown=node:node package*.json ./
+
+COPY --chown=node:node tsconfig.json ./
 
 RUN npm i -g typescript\
-    && npm ci --only=production
+    && npm i
 
-COPY . .
+COPY --chown=node:node app app
 
 RUN tsc
 
-COPY --chown=node:node . .
+
+
+FROM node:alpine
+
+WORKDIR /app
+
+COPY --chown=node:node package*.json ./
+
+RUN npm i --production
+
+COPY --chown=node:node --from=build /app/build build
 
 EXPOSE 3000
 
