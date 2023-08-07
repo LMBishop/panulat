@@ -64,6 +64,11 @@ const setOpenInSpotify = (songUrl) => {
 const connectWebsocket = () => {
     const connectionStatus = document.getElementById('connection-status-text');
     const connectionStatusIndicator = document.getElementById('connection-status-indicator');
+    const songTitle = document.getElementById('song-title');
+    const songArtist = document.getElementById('song-artist');
+    const songAlbum = document.getElementById('song-album');
+    const songAlbumArt = document.getElementById('song-album-art');
+
     const onDisconnect = () => {
         connectionStatus.innerHTML = "Disconnected";
         connectionStatusIndicator.style.backgroundColor = disconnectedColor;
@@ -71,19 +76,17 @@ const connectWebsocket = () => {
         clearInterval(predictProgressInterval);
     }
     const onConnect = () => {
-        connectionStatus.innerHTML = "Connected";
-        connectionStatusIndicator.style.backgroundColor = connectedColor;
+        connectionStatus.innerHTML = "Connected. Waiting for data...";
+        connectionStatusIndicator.style.backgroundColor = connectingColor;
     }
     
     connectionStatus.innerHTML = "Connecting";
     connectionStatusIndicator.style.backgroundColor = connectingColor;
     
-    const songTitle = document.getElementById('song-title');
-    const songArtist = document.getElementById('song-artist');
-    const songAlbum = document.getElementById('song-album');
-    const songAlbumArt = document.getElementById('song-album-art');
-    
     const updateData = (data) => {
+        connectionStatus.innerHTML = "Connected";
+        connectionStatusIndicator.style.backgroundColor = connectedColor;
+
         clearInterval(predictProgressInterval);
         progressMillis = data.progress;
         durationMillis = data.duration;
