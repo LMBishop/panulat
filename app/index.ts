@@ -4,6 +4,8 @@ import * as page from './routes/page/router.js';
 import * as blog from './routes/blog/router.js';
 import { logger } from './logger.js'
 import { PageDirectory } from './pages.js';
+import { directory } from './middlewares/index.js';
+import { blogs } from './middlewares/blogs.js';
 
 dotenv.config()
 
@@ -15,6 +17,10 @@ app.use(express.static('static', {
     etag: true,
     maxAge: '1d'
 }));
+
+const pageDirectory = new PageDirectory(process.env.PAGES_DIR);
+app.use(directory(pageDirectory));
+app.use(blogs(pageDirectory));
 
 app.use(blog.router);
 app.use(page.router);
@@ -36,7 +42,7 @@ const exit = () => {
     })
 }
 
-PageDirectory.rebuild('pages');
+pageDirectory.loadFromDisk();
 
 process.on('SIGINT', exit);
 process.on('SIGTERM', exit);

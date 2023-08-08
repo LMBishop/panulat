@@ -3,9 +3,9 @@ import glob from 'glob';
 import { logger } from './logger.js'
 import { marked } from 'marked';
 import matter from 'gray-matter';
+import chokidar from 'chokidar';
 
 export function buildPage(page: Page) {
-    logger.info(`Building ${page.path}`);
     try {
         const result = matter(page.raw);
         const metadata = result.data;
@@ -19,60 +19,92 @@ export function buildPage(page: Page) {
     }
 }
 
-export namespace PageDirectory {
-    export const pages: Record<string, Page> = {};
-    export let lastBuild: number;
+function loadRaw(path: string): string {
+    return readFileSync(`${path}`, 'utf-8'); 
+}
+
+export class PageDirectory {
+    private pagesPath: string;
+
+    public pages: Record<string, Page> = {};
+    public lastFullBuild: number;
     
-    export const rebuild = (pagePath: string): boolean => {
-        for (const page in pages) {
-            delete pages[page];
+    constructor(pagesPath: string) {
+        this.pagesPath = pagesPath;
+    }
+    
+    public loadFromDisk = () => {
+        for (const page in this.pages) {
+            delete this.pages[page];
         }
 
-        const localPages = glob.sync(`**/*.{md,html}`, { cwd: pagePath })
+        const localPages = glob.sync(`**/*.{md,html}`, { cwd: this.pagesPath })
 
-        // Load page content
-        localPages.forEach(page => {
-            let route = page.replace(/\.[^.]*$/,'')
-            let name = /[^/]*$/.exec(route)[0];
-            let path = `${pagePath}/${page}`
-            let raw: string;
-            try {
-                raw = loadRaw(path);
-            } catch (e) {
-                logger.error(`Failed to read page ${path}: ${e.message}`);
-                return;
-            }
+        localPages.forEach(this.loadPage);
 
-            pages[route] = {
-                route: route,
-                name: name,
-                path: path,
-                raw: raw,
-                buildTime: 0,
-                metadata: {
-                    title: "A Page"
-                }
-            }
+        this.lastFullBuild = Date.now();
+        
+        const watcher = chokidar.watch('.', {
+            persistent: true,
+            cwd: this.pagesPath,
+            ignoreInitial: true,
         });
         
-        // Build pages
-        Object.values(pages).forEach(page => buildPage(page));
+        const onPageChange = (page: string) => {
+            logger.info(`File ${page} has been modified`);
+            this.loadPage(page);
+        }
 
-        lastBuild = Date.now();
-        return true;
+        const onPageRemoval = (page: string) => {
+            logger.info(`File ${page} has been removed`);
+            this.removePage(page);
+        }
+        
+        watcher.on('add', onPageChange);
+        watcher.on('change', onPageChange);
+        watcher.on('unlink', onPageRemoval);
+    }
+    
+    public loadPage = (page: string): void => {
+        logger.info(`Building page ${page}`);
+        let route = page.replace(/\.[^.]*$/,'')
+        let name = /[^/]*$/.exec(route)[0];
+        let path = `${this.pagesPath}/${page}`
+        let raw: string;
+        try {
+            raw = loadRaw(path);
+        } catch (e) {
+            logger.error(`Failed to read page ${path}: ${e.message}`);
+            return;
+        }
+
+        this.pages[route] = {
+            route: route,
+            name: name,
+            path: path,
+            raw: raw,
+            buildTime: 0,
+            metadata: {
+                title: "A Page"
+            }
+        }
+        
+        buildPage(this.pages[route]);
+    }
+    
+    public removePage = (page: string): void => {
+        logger.info(`Unloading page ${page}`);
+        let route = page.replace(/\.[^.]*$/,'')
+        delete this.pages[route];
     }
 
-    export function get(name: string): Page {
-        const page = pages[name];
+    public get(name: string): Page {
+        const page = this.pages[name];
         if (!page) {
             return undefined;
         }
 
         return page;
-    }
-
-    function loadRaw(path: string): string {
-        return readFileSync(`${path}`, 'utf-8'); 
     }
 }
 

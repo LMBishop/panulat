@@ -7,6 +7,7 @@ services:
       - "3000:3000"
     volumes:
       - .env:/app/.env:ro
+      - .env.defaults:/app/.env.defaults:ro
       - ./pages:/app/pages:ro
       - ./static:/app/static:ro
       - ./views:/app/views:ro
