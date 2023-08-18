@@ -7,8 +7,7 @@ gmod game mode by Mechanical Mind for [s&box](https://sbox.facepunch.com/).
 
 Trying to expand the number of things I can Actually Cook.
 
-Enjoying the relative freedom and lack of stress during the few weeks I have 
-after the end of semester, and before my year long placement.
+Starting a new job as a trainee software engineer.
 
 <br>
 
