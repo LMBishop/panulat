@@ -17,6 +17,8 @@ RUN tsc
 
 FROM node:alpine
 
+LABEL org.opencontainers.image.source=https://github.com/LMBishop/panulat
+
 WORKDIR /app
 
 COPY --chown=node:node package*.json ./
