@@ -6,14 +6,16 @@ import { logger } from '../logger.js';
 
 export async function buildPages(): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
     // Recreate output directory
-    try {
-        if (fs.existsSync(process.env.OUTPUT_DIR)) {
-            fs.rmSync(process.env.OUTPUT_DIR, { recursive: true });
+    if (process.env.SKIP_OUTPUT_DIR_CREATION !== 'true') {
+        try {
+            if (fs.existsSync(process.env.OUTPUT_DIR)) {
+                fs.rmSync(process.env.OUTPUT_DIR, { recursive: true });
+            }
+            fs.mkdirSync(process.env.OUTPUT_DIR);
+        } catch (e) {
+            logger.error(`Failed to create output directory: ${e.message}`);
+            return { success: false, errors: 0, pageDirectory: null };
         }
-        fs.mkdirSync(process.env.OUTPUT_DIR);
-    } catch (e) {
-        logger.error(`Failed to create output directory: ${e.message}`);
-        return { success: false, errors: 0, pageDirectory: null };
     }
 
 
