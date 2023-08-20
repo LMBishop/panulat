@@ -25,10 +25,10 @@ COPY --chown=node:node package*.json ./
 
 RUN npm i --production
 
-COPY --chown=node:node --from=build /app/dist build
+COPY --chown=node:node --from=build /app/dist dist
 
 EXPOSE 3000
 
 USER node
 
-CMD [ "node", "build/index.js" ]
+CMD [ "node", "dist/index.js" ]
