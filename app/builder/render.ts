@@ -17,7 +17,7 @@ export async function render(page: Page, pageDirectory: PageDirectory): Promise<
                 release: os.release(),
                 type: os.type(),
             },
-            palunat: {
+            panulat: {
                 version: process.env.npm_package_version,
             },
         }
