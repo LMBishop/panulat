@@ -1,7 +1,7 @@
 import { Page, PageDirectory } from "./pages";
 import ejs from 'ejs';
 import path from 'path';
-import os from 'os';
+import buildInfo from "../config/info.js";
 
 export async function render(page: Page, pageDirectory: PageDirectory): Promise<string> {
     const options = {
@@ -9,18 +9,7 @@ export async function render(page: Page, pageDirectory: PageDirectory): Promise<
         site: {
             pages: pageDirectory,
         },
-        build: {
-            date: new Date(),
-            os: {
-                hostname: os.hostname(),
-                platform: os.platform(),
-                release: os.release(),
-                type: os.type(),
-            },
-            panulat: {
-                version: process.env.npm_package_version,
-            },
-        }
+        build: buildInfo,
     };
     return await ejs.renderFile(path.join(process.env.VIEWS_DIR, `${page.view}.ejs`), options);
 }
