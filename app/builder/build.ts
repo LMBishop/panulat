@@ -51,7 +51,7 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
         logger.error(`Failed to copy static files: ${e.message}`);
     }
 
-    return { success: true, errors: pagesFailed, pageDirectory: pageDirectory};
+    return { success: pagesFailed == 0, errors: pagesFailed, pageDirectory: pageDirectory};
 }
 
 async function renderPage(page: Page, pageDirectory: PageDirectory): Promise<boolean> {

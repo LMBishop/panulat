@@ -21,12 +21,19 @@ logger.info('');
 const {success, errors, pageDirectory} = await buildPages();
 
 logger.info('');
-if (!success) {
+if (!success && errors == 0) {
     logger.error(`Build failed. Quitting.`);
     process.exit(1);
 }
 
-logger.info(`Finished${errors > 0 ? `, with ${errors} errors` : ''}. Build took ${new Date().getTime() - startDate.getTime()}ms.`);
+const exitString = `Finished${errors > 0 ? `, with ${errors} errors` : ''}. Build took ${new Date().getTime() - startDate.getTime()}ms.`;
+
+if (!success) {
+    logger.error(exitString);
+    process.exit(1);
+} else {
+    logger.info(exitString);
+}
 
 if (process.env.WEBSERVER_ENABLED === 'true') {
     logger.info('');
