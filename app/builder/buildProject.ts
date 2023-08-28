@@ -1,5 +1,5 @@
-import { render } from './render.js';
-import { Page, PageDirectory } from './pages.js';
+import { render } from './renderPage.js';
+import { Page, PageDirectory } from './pageDirectory.js';
 import fs from 'fs';
 import path from 'path';
 import { logger } from '../logger.js';

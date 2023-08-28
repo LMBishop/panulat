@@ -1,4 +1,4 @@
-import { Page, PageDirectory } from "./pages";
+import { Page, PageDirectory } from "./pageDirectory";
 import ejs from 'ejs';
 import path from 'path';
 import buildInfo from "../config/info.js";

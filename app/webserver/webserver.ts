@@ -1,7 +1,7 @@
 import express from 'express';
 import { logger } from '../logger.js';
 import { AddressInfo } from 'net';
-import { PageDirectory } from '../builder/pages.js';
+import { PageDirectory } from '../builder/pageDirectory.js';
 
 const app = express();
 
@@ -16,7 +16,7 @@ export const start = (pages: PageDirectory) => {
         logger.info('')
         
         if (process.env.WEBSERVER_AUTOREBUILD === 'true') {
-            import('./watcher.js').then((watcher) => {
+            import('./fileWatcher.js').then((watcher) => {
                 watcher.start(pages);
             });
         }

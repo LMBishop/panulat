@@ -1,6 +1,6 @@
 import dotenv from 'dotenv-defaults';
 import { logger } from './logger.js';
-import { buildPages } from './builder/build.js';
+import { buildPages } from './builder/buildProject.js';
 import buildInfo from './config/info.js';
 
 dotenv.config();

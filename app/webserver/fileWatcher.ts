@@ -1,7 +1,7 @@
 import chokidar, { FSWatcher } from 'chokidar';
 import { logger } from '../logger.js';
-import { PageDirectory } from '../builder/pages.js';
-import { rebuildSinglePage } from '../builder/build.js';
+import { PageDirectory } from '../builder/pageDirectory.js';
+import { rebuildSinglePage } from '../builder/buildProject.js';
 import path from 'path';
 import fs from 'fs';
 
