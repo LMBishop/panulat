@@ -44,7 +44,7 @@ export class PageDirectory {
     }
     
     public loadPage = (page: string): Page => {
-        let route = page.replace(/\.[^.]*$/,'')
+        let route = `/${page.replace(/\.[^.]*$/,'')}`;
         let name = /[^/]*$/.exec(route)[0];
         let originalPath = page;
         let fullPath = `${this.pagesPath}/${page}`
