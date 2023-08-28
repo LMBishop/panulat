@@ -22,6 +22,7 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
     // Load pages
     logger.info(`Reading pages from disk...`);
     const pageDirectory = new PageDirectory(process.env.PAGES_DIR);
+    await pageDirectory.init();
 
     let pagesCount = Object.keys(pageDirectory.getPages()).length;
     logger.info(`Found ${pagesCount} pages.`);
@@ -78,7 +79,7 @@ async function renderPage(page: Page, pageDirectory: PageDirectory): Promise<boo
 }
 
 export async function rebuildSinglePage(path: string, pageDirectory: PageDirectory): Promise<boolean> {
-    const page = pageDirectory.loadPage(path);
+    const page = await pageDirectory.loadPage(path);
     if (!page) {
         return false;
     }
