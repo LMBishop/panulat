@@ -9,6 +9,7 @@
   },
   "author": "Leonardo Bishop",
   "dependencies": {
+    "@types/clean-css": "^4.2.6",
     "@types/html-minifier-terser": "^7.0.0",
     "axios": "^1.4.0",
     "chokidar": "^3.5.3",
@@ -23,6 +24,7 @@
     "html-minifier-terser": "^7.2.0",
     "marked": "^6.0.0",
     "marked-gfm-heading-id": "^3.0.6",
+    "sass": "^1.66.1",
     "uglify-js": "^3.17.4",
     "winston": "^3.3.3",
     "ws": "^8.13.0"

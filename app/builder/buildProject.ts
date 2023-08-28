@@ -3,6 +3,8 @@ import { Page, PageDirectory } from './pageDirectory.js';
 import fs from 'fs';
 import path from 'path';
 import { logger } from '../logger.js';
+import glob from 'glob';
+import { process as processCss } from './processCss.js';
 
 export async function buildPages(): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
     // Recreate output directory
@@ -42,15 +44,62 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
 
     logger.info(`Rendered ${pagesRendered} of ${pagesCount} pages.`);
 
+    //TODO move to util
+    const ensureParentDirExists = (file: string) => {
+        const joinedOutputPath = path.join(process.env.OUTPUT_DIR, 'static', file);
+        const dir = path.dirname(joinedOutputPath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        return joinedOutputPath;
+    };
 
     // Copy static files
     logger.info(`Copying static files...`);
     try {
-        fs.cpSync(`${process.env.STATIC_DIR}`, `${process.env.OUTPUT_DIR}/static`, { recursive: true });
+        const files = glob.sync(`**/*`, { 
+            cwd: process.env.STATIC_DIR, 
+            nodir: true,
+            ignore: ['**/*.scss', '**/*.css']
+        })
+        
+        for (const file of files) {
+            const outputPath = ensureParentDirExists(file);
+            const joinedPath = path.join(process.env.STATIC_DIR, file);
+            fs.copyFileSync(joinedPath, outputPath);
+        }
+
         logger.info(`Done.`);
     } catch (e) {
         logger.error(`Failed to copy static files: ${e.message}`);
     }
+    
+    // Process CSS files
+    const cssFiles = glob.sync(`**/*.{css,scss}`, {
+        cwd: process.env.STATIC_DIR,
+        nodir: true,
+    });
+    if (cssFiles.length > 0) {
+        logger.info(`Processing CSS files...`);
+
+        for (const file of cssFiles) {
+            const outputPath = ensureParentDirExists(file);
+            const joinedPath = path.join(process.env.STATIC_DIR, file);
+            let processedCss: string;
+            try {
+                processedCss = await processCss(joinedPath);
+            } catch (e) {
+                logger.error(`Failed to process CSS file ${joinedPath}`);
+                logger.error(e.message);
+                continue;
+            }
+            const newOutputPath = outputPath.replace(/\.scss$/, '.css');
+            fs.writeFileSync(newOutputPath, processedCss);
+        }
+        
+        logger.info(`Done.`);
+    }
+    
 
     return { success: pagesFailed == 0, errors: pagesFailed, pageDirectory: pageDirectory};
 }
