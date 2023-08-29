@@ -9,12 +9,13 @@ logger.info('');
 logger.info(`panulat v${buildInfo.panulat.version}, a static site generator`);
 logger.info(buildInfo.date);
 logger.info('');
-logger.info(`Static directory: ${process.env.STATIC_DIR}`);
-logger.info(` Pages directory: ${process.env.PAGES_DIR}`);
-logger.info(` Views directory: ${process.env.VIEWS_DIR}`);
-logger.info(`Output directory: ${process.env.OUTPUT_DIR}`);
-logger.info(`       Webserver: ${process.env.WEBSERVER_ENABLED === 'true' ? 'enabled' : 'disabled'}`);
-logger.info(`     Autorebuild: ${process.env.WEBSERVER_AUTOREBUILD === 'true' ? 'enabled' : 'disabled'}`);
+logger.info(`   Static directory: ${process.env.STATIC_DIR}`);
+logger.info(`    Pages directory: ${process.env.PAGES_DIR}`);
+logger.info(`    Views directory: ${process.env.VIEWS_DIR}`);
+logger.info(`   Output directory: ${process.env.OUTPUT_DIR}`);
+logger.info(`          Webserver: ${process.env.WEBSERVER_ENABLED === 'true' ? 'enabled' : 'disabled'}`);
+logger.info(`       Auto rebuild: ${process.env.WEBSERVER_AUTOREBUILD === 'true' ? 'enabled' : 'disabled'}`);
+logger.info(`Incremental rebuild: disabled`); //TODO
 logger.info('');
 
 const {success, errors, pageDirectory} = await buildPages();

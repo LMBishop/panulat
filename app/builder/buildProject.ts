@@ -6,7 +6,7 @@ import { logger } from '../logger.js';
 import glob from 'glob';
 import { process as processCss } from './processCss.js';
 
-export async function buildPages(): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
+export async function buildPages(verbose: boolean = true): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
     // Recreate output directory
     if (process.env.SKIP_OUTPUT_DIR_CREATION !== 'true') {
         try {
@@ -22,16 +22,16 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
 
 
     // Load pages
-    logger.info(`Reading pages from disk...`);
+    if (verbose) logger.info(`Reading pages from disk...`);
     const pageDirectory = new PageDirectory(process.env.PAGES_DIR);
     await pageDirectory.init();
 
     let pagesCount = Object.keys(pageDirectory.getPages()).length;
-    logger.info(`Found ${pagesCount} pages.`);
+    if (verbose) logger.info(`Found ${pagesCount} pages.`);
 
 
     // Render pages
-    logger.info(`Rendering pages...`);
+    if (verbose) logger.info(`Rendering pages...`);
     let pagesRendered = 0;
     let pagesFailed = 0;
     for (const page of pageDirectory.getPages()) {
@@ -42,7 +42,7 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
         } 
     }
 
-    logger.info(`Rendered ${pagesRendered} of ${pagesCount} pages.`);
+    if (verbose) logger.info(`Rendered ${pagesRendered} of ${pagesCount} pages.`);
 
     //TODO move to util
     const ensureParentDirExists = (file: string) => {
@@ -55,7 +55,7 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
     };
 
     // Copy static files
-    logger.info(`Copying static files...`);
+    if (verbose) logger.info(`Copying static files...`);
     try {
         const files = glob.sync(`**/*`, { 
             cwd: process.env.STATIC_DIR, 
@@ -69,9 +69,10 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
             fs.copyFileSync(joinedPath, outputPath);
         }
 
-        logger.info(`Done.`);
+        if (verbose) logger.info(`Done.`);
     } catch (e) {
         logger.error(`Failed to copy static files: ${e.message}`);
+        logger.error(e);
     }
     
     // Process CSS files
@@ -80,7 +81,7 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
         nodir: true,
     });
     if (cssFiles.length > 0) {
-        logger.info(`Processing CSS files...`);
+        if (verbose) logger.info(`Processing CSS files...`);
 
         for (const file of cssFiles) {
             const outputPath = ensureParentDirExists(file);
@@ -97,7 +98,7 @@ export async function buildPages(): Promise<{ success: boolean, errors: number, 
             fs.writeFileSync(newOutputPath, processedCss);
         }
         
-        logger.info(`Done.`);
+        if (verbose) logger.info(`Done.`);
     }
     
 

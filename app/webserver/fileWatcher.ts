@@ -1,7 +1,7 @@
 import chokidar, { FSWatcher } from 'chokidar';
 import { logger } from '../logger.js';
 import { PageDirectory } from '../builder/pageDirectory.js';
-import { rebuildSinglePage } from '../builder/buildProject.js';
+import { buildPages, rebuildSinglePage } from '../builder/buildProject.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -92,6 +92,36 @@ function attachViewEvents(watcher: FSWatcher, pages: PageDirectory) {
     watcher.on('unlink', onViewRemoval);
 }
 
+let buildInProgress = false;
+
+function attachFullRebuildEvents(watcher: FSWatcher) {
+    
+    const onFullRebuild = async (file: string) => {
+        if (buildInProgress) {
+            logger.info(`File ${file} has been modified, but a build is already in progress. Skipping...`);
+            return;
+        }
+        buildInProgress = true;
+        
+        logger.info(`File ${file} has been modified, starting full rebuild...`);
+        const startDate = new Date();
+        const {success, errors, pageDirectory} = await buildPages(false);
+        const endDate = new Date();
+        const finishString = `...done${errors > 0 ? `, with ${errors} errors` : ''}, after ${endDate.getTime() - startDate.getTime()}ms.`; 
+        if (!success) {
+            logger.error(finishString);
+        } else {
+            logger.info(finishString);
+        }
+        logger.info(``);
+        buildInProgress = false;
+    }
+
+    watcher.on('add', onFullRebuild);
+    watcher.on('change', onFullRebuild);
+    watcher.on('unlink', onFullRebuild);
+}
+
 export const start = (pages: PageDirectory) => {
     const pagesWatcher = chokidar.watch('.', {
         persistent: true,
@@ -109,9 +139,13 @@ export const start = (pages: PageDirectory) => {
         ignoreInitial: true,
     });
 
-    attachPageEvents(pagesWatcher, pages);
-    attachStaticEvents(staticWatcher);
-    attachViewEvents(viewsWatcher, pages);
+    // attachPageEvents(pagesWatcher, pages);
+    // attachStaticEvents(staticWatcher);
+    // attachViewEvents(viewsWatcher, pages);
+    // 
+    attachFullRebuildEvents(pagesWatcher);
+    attachFullRebuildEvents(staticWatcher);
+    attachFullRebuildEvents(viewsWatcher);
     
     const exitHandler = () => {
         logger.info(`Stopping file watcher...`);
