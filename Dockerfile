@@ -1,4 +1,4 @@
-FROM node:alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -6,16 +6,15 @@ COPY --chown=node:node package*.json ./
 
 COPY --chown=node:node tsconfig.json ./
 
-RUN npm i -g typescript\
-    && npm i
+RUN npm i
 
 COPY --chown=node:node app app
 
-RUN tsc
+RUN npx tsc
 
 
 
-FROM node:alpine
+FROM node:20-alpine
 
 LABEL org.opencontainers.image.source=https://github.com/LMBishop/panulat
 
