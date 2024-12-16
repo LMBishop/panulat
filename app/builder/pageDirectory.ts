@@ -5,8 +5,22 @@ import { marked } from "marked";
 import { gfmHeadingId } from "marked-gfm-heading-id";
 import markedFootnote from "marked-footnote";
 import matter from "gray-matter";
+import { markedHighlight } from "marked-highlight";
+import hljs from "highlight.js";
+import hljsDefineSolidity from 'highlightjs-solidity';
+
+hljsDefineSolidity(hljs);
+hljs.initHighlightingOnLoad();
 
 marked.use(gfmHeadingId());
+marked.use(markedHighlight({
+    emptyLangClass: 'hljs',
+    langPrefix: 'hljs language-',
+    highlight(code, lang, info) {
+        const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language }).value;
+    }
+}));
 
 export async function parsePage(page: Page) {
     try {
