@@ -1,6 +1,6 @@
 {
   "name": "panulat",
-  "version": "1.5",
+  "version": "1.5.1",
   "description": "",
   "main": "app/index.mjs",
   "scripts": {

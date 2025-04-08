@@ -7,7 +7,7 @@ import glob from 'glob';
 import { process as processCss } from './processCss.js';
 import { discoverFeed } from './discoverFeed.js';
 
-export async function buildPages(verbose: boolean = true): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
+export async function buildPages(verbose = true): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
     // Recreate output directory
     if (process.env.SKIP_OUTPUT_DIR_CREATION !== 'true') {
         try {
@@ -27,7 +27,7 @@ export async function buildPages(verbose: boolean = true): Promise<{ success: bo
     const pageDirectory = new PageDirectory(process.env.PAGES_DIR);
     await pageDirectory.init();
 
-    let pagesCount = Object.keys(pageDirectory.getPages()).length;
+    const pagesCount = Object.keys(pageDirectory.getPages()).length;
     if (verbose) logger.info(`Found ${pagesCount} pages.`);
 
 
@@ -59,7 +59,7 @@ export async function buildPages(verbose: boolean = true): Promise<{ success: bo
 
     //TODO move to util
     const ensureParentDirExists = (file: string) => {
-        const joinedOutputPath = path.join(process.env.OUTPUT_DIR, 'static', file);
+        const joinedOutputPath = path.join(process.env.OUTPUT_DIR, file);
         const dir = path.dirname(joinedOutputPath);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
@@ -113,7 +113,6 @@ export async function buildPages(verbose: boolean = true): Promise<{ success: bo
         
         if (verbose) logger.info(`Done.`);
     }
-    
 
     return { success: pagesFailed == 0, errors: pagesFailed, pageDirectory: pageDirectory};
 }
