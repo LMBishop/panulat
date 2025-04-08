@@ -1,6 +1,6 @@
 {
   "name": "panulat",
-  "version": "1.4",
+  "version": "1.5",
   "description": "",
   "main": "app/index.mjs",
   "scripts": {
@@ -29,7 +29,8 @@
     "sass": "^1.66.1",
     "uglify-js": "^3.17.4",
     "winston": "^3.3.3",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "yaml": "^2.7.1"
   },
   "type": "module",
   "devDependencies": {

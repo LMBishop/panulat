@@ -5,6 +5,7 @@ import path from 'path';
 import { logger } from '../logger.js';
 import glob from 'glob';
 import { process as processCss } from './processCss.js';
+import { discoverFeed } from './discoverFeed.js';
 
 export async function buildPages(verbose: boolean = true): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
     // Recreate output directory
@@ -43,6 +44,18 @@ export async function buildPages(verbose: boolean = true): Promise<{ success: bo
     }
 
     if (verbose) logger.info(`Rendered ${pagesRendered} of ${pagesCount} pages.`);
+
+    // Discover feeds
+    if (verbose) logger.info(`Discovering feeds...`);
+    const feeds = pageDirectory.getFeeds();
+    for (const feed of feeds) {
+        try {
+            await discoverFeed(feed, pageDirectory);
+        } catch (e) {
+            logger.error(`Failed to discover feed ${feed.title}: ${e.message}`);
+        }
+    }
+
 
     //TODO move to util
     const ensureParentDirExists = (file: string) => {

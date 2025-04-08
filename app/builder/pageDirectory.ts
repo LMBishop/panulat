@@ -8,6 +8,7 @@ import matter from "gray-matter";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
 import hljsDefineSolidity from 'highlightjs-solidity';
+import YAML from 'yaml'
 
 hljsDefineSolidity(hljs);
 hljs.initHighlightingOnLoad();
@@ -47,6 +48,7 @@ export class PageDirectory {
     private pagesPath: string;
 
     private pages: Record<string, Page> = {};
+    private feeds: Record<string, Feed> = {};
     private lastFullBuild: number;
 
     constructor(pagesPath: string) {
@@ -61,6 +63,10 @@ export class PageDirectory {
         const localPages = glob.sync(`**/*.{md,html}`, { cwd: this.pagesPath });
         for (const page in localPages) {
             await this.loadPage(localPages[page]);
+        }
+        const localFeeds = glob.sync(`**/feed.yml`, { cwd: this.pagesPath });
+        for (const feed in localFeeds) {
+            await this.loadFeed(localFeeds[feed]);
         }
         this.lastFullBuild = Date.now();
     };
@@ -97,6 +103,28 @@ export class PageDirectory {
         return this.pages[route];
     };
 
+    public loadFeed = async (path: string): Promise<Feed> => {
+        let feed;
+        try {
+            feed = YAML.parse(loadRaw(`${this.pagesPath}/${path}`));
+        } catch (e) {
+            logger.error(`Failed to read feed ${path}: ${e.message}`);
+            return undefined;
+        }
+
+        this.feeds[feed.pages] = {
+            title: feed.title,
+            route: feed.pages,
+            url: feed.url,
+            buildPath: `${process.env.OUTPUT_DIR}/${feed.pages}/atom.xml`,
+            paramStrategy: feed.paramStrategy,
+            updated: new Date(0),
+            entries: []
+        }
+
+        return this.feeds[feed.pages];
+    };
+
     public removePage = (page: string): void => {
         let route = page.replace(/\.[^.]*$/, "");
         delete this.pages[route];
@@ -113,6 +141,10 @@ export class PageDirectory {
 
     public getPages(): Page[] {
         return Object.values(this.pages);
+    }
+
+    public getFeeds(): Feed[] {
+        return Object.values(this.feeds);
     }
 
     public getPagesBeginningWith(prefix: string): Page[] {
@@ -134,3 +166,21 @@ export type Page = {
     buildTime: number;
     config: any;
 };
+
+export type Feed = {
+    route: string;
+    title: string;
+    url: string;
+    buildPath: string;
+    paramStrategy: any;
+    updated: Date;
+    entries: FeedEntry[];
+}
+
+export type FeedEntry = {
+    title: string;
+    updated: Date;
+    id: string;
+    url: string;
+    description: string;
+}
