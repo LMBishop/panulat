@@ -183,4 +183,5 @@ export type FeedEntry = {
     id: string;
     url: string;
     description: string;
+    content: string;
 }

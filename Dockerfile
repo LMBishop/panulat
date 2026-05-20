@@ -28,6 +28,4 @@ COPY --chown=node:node --from=build /app/dist dist
 
 EXPOSE 3000
 
-USER node
-
 CMD [ "npm", "start" ]

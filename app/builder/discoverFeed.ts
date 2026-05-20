@@ -21,7 +21,7 @@ export async function discoverFeed(feed: Feed, pageDirectory: PageDirectory): Pr
             id: page.name,
             url: `${feed.url}/${page.name}`,
             description: page.config[descriptionConfigPath] || "",
-            // description: page.html?.length > 100 ? `${page.html?.substring(0, 100)}...` || "" : page.html || "",
+            content: page.html || "",
         };
         entries.push(entry);
     }
@@ -48,6 +48,7 @@ ${feed.entries
 <id>${entry.id}</id>
 <link rel="alternate" href="${entry.url}" type="text/html"/>
 <summary>${entry.description}</summary>
+<content type="text/html"><![CDATA[${entry.content}]]></content>
 </entry>`;
         })
         .join("\n")}
