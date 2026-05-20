@@ -32,6 +32,7 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
 
 
     // Render pages
+    if (verbose) logger.info(``);
     if (verbose) logger.info(`Rendering pages...`);
     let pagesRendered = 0;
     let pagesFailed = 0;
@@ -43,14 +44,15 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
         } 
     }
 
-    if (verbose) logger.info(`Rendered ${pagesRendered} of ${pagesCount} pages.`);
-
     // Discover feeds
+    if (verbose) logger.info(``);
     if (verbose) logger.info(`Discovering feeds...`);
     const feeds = pageDirectory.getFeeds();
     for (const feed of feeds) {
         try {
+            let startDate = new Date().getTime();
             await discoverFeed(feed, pageDirectory);
+            logger.info(`${feed.originalPath} => ${feed.outputPath} (${new Date().getTime() - startDate}ms)`)
         } catch (e) {
             logger.error(`Failed to discover feed ${feed.title}: ${e.message}`);
         }
@@ -68,6 +70,7 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
     };
 
     // Copy static files
+    if (verbose) logger.info(``);
     if (verbose) logger.info(`Copying static files...`);
     try {
         const files = glob.sync(`**/*`, { 
@@ -77,12 +80,12 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
         })
         
         for (const file of files) {
+            let startDate = new Date().getTime();
             const outputPath = ensureParentDirExists(file);
             const joinedPath = path.join(process.env.STATIC_DIR, file);
             fs.copyFileSync(joinedPath, outputPath);
+            logger.info(`${file} => /${file} (${new Date().getTime() - startDate}ms)`)
         }
-
-        if (verbose) logger.info(`Done.`);
     } catch (e) {
         logger.error(`Failed to copy static files: ${e.message}`);
         logger.error(e);
@@ -94,9 +97,11 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
         nodir: true,
     });
     if (cssFiles.length > 0) {
+        if (verbose) logger.info(``);
         if (verbose) logger.info(`Processing CSS files...`);
 
         for (const file of cssFiles) {
+            let startDate = new Date().getTime();
             const outputPath = ensureParentDirExists(file);
             const joinedPath = path.join(process.env.STATIC_DIR, file);
             let processedCss: string;
@@ -109,15 +114,15 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
             }
             const newOutputPath = outputPath.replace(/\.scss$/, '.css');
             fs.writeFileSync(newOutputPath, processedCss);
+            logger.info(`${file} => /${file.replace(/\.scss$/, '.css')} (${new Date().getTime() - startDate}ms)`)
         }
-        
-        if (verbose) logger.info(`Done.`);
     }
 
     return { success: pagesFailed == 0, errors: pagesFailed, pageDirectory: pageDirectory};
 }
 
 async function renderPage(page: Page, pageDirectory: PageDirectory): Promise<boolean> {
+    let startDate = new Date().getTime();
     let html;
     try {
         html = await render(page, pageDirectory);
@@ -133,6 +138,7 @@ async function renderPage(page: Page, pageDirectory: PageDirectory): Promise<boo
             fs.mkdirSync(dir, { recursive: true });
         }
         fs.writeFileSync(file, html);
+        logger.info(`${page.originalPath} => ${page.outputPath} (${page.view}.ejs, ${new Date().getTime() - startDate}ms)`)
     } catch (e) {
         logger.error(`Failed to write page ${page.buildPath}: ${e.message}`);
         return false;

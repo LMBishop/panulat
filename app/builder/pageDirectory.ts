@@ -76,7 +76,8 @@ export class PageDirectory {
         let name = /[^/]*$/.exec(route)[0];
         let originalPath = page;
         let fullPath = `${this.pagesPath}/${page}`;
-        let buildPath = `${process.env.OUTPUT_DIR}/${route}.html`;
+        let outputPath = `${route}.html`
+        let buildPath = `${process.env.OUTPUT_DIR}/${outputPath}`;
         let view = `${route}`;
         let raw: string;
         try {
@@ -91,6 +92,7 @@ export class PageDirectory {
             name: name,
             originalPath: originalPath,
             fullPath: fullPath,
+            outputPath: outputPath,
             buildPath: buildPath,
             view: view,
             raw: raw,
@@ -116,6 +118,8 @@ export class PageDirectory {
             title: feed.title,
             route: feed.pages,
             url: feed.url,
+            originalPath: path,
+            outputPath: `${feed.pages}/atom.xml`,
             buildPath: `${process.env.OUTPUT_DIR}/${feed.pages}/atom.xml`,
             paramStrategy: feed.paramStrategy,
             updated: new Date(0),
@@ -161,6 +165,7 @@ export type Page = {
     name: string;
     originalPath: string;
     fullPath: string;
+    outputPath: string;
     buildPath: string;
     view: string;
     buildTime: number;
@@ -171,6 +176,8 @@ export type Feed = {
     route: string;
     title: string;
     url: string;
+    originalPath: string;
+    outputPath: string;
     buildPath: string;
     paramStrategy: any;
     updated: Date;
