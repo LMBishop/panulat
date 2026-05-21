@@ -1,5 +1,6 @@
 import { render } from './renderPage.js';
 import { Page, PageDirectory } from './pageDirectory.js';
+import { Options } from '../options.js';
 import fs from 'fs';
 import path from 'path';
 import { logger } from '../logger.js';
@@ -7,14 +8,14 @@ import glob from 'glob';
 import { process as processCss } from './processCss.js';
 import { discoverFeed } from './discoverFeed.js';
 
-export async function buildPages(verbose = true): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
+export async function buildPages(options: Options): Promise<{ success: boolean, errors: number, pageDirectory: PageDirectory}> {
     // Recreate output directory
-    if (process.env.SKIP_OUTPUT_DIR_CREATION !== 'true') {
+    if (options.createOutputDir) {
         try {
-            if (fs.existsSync(process.env.OUTPUT_DIR)) {
-                fs.rmSync(process.env.OUTPUT_DIR, { recursive: true });
+            if (fs.existsSync(options.outputDir)) {
+                fs.rmSync(options.outputDir, { recursive: true });
             }
-            fs.mkdirSync(process.env.OUTPUT_DIR);
+            fs.mkdirSync(options.outputDir);
         } catch (e) {
             logger.error(`Failed to create output directory: ${e.message}`);
             return { success: false, errors: 0, pageDirectory: null };
@@ -23,45 +24,59 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
 
 
     // Load pages
-    if (verbose) logger.info(`Reading pages from disk...`);
-    const pageDirectory = new PageDirectory(process.env.PAGES_DIR);
-    await pageDirectory.init();
+    logger.info(`Reading pages from disk...`);
+    let pagesCount;
+    let feedsCount;
+    const pageDirectory = new PageDirectory(options.pagesDir, options.outputDir);
+    {
+        let startDate = new Date().getTime();
+        await pageDirectory.init();
 
-    const pagesCount = Object.keys(pageDirectory.getPages()).length;
-    if (verbose) logger.info(`Found ${pagesCount} pages.`);
+        pagesCount = Object.keys(pageDirectory.getPages()).length;
+        feedsCount = Object.keys(pageDirectory.getFeeds()).length;
+        if (feedsCount > 0) {
+            logger.info(`Parsed ${pagesCount} pages and ${feedsCount} feeds (${new Date().getTime() - startDate}ms)`);
+        } else {
+            logger.info(`Parsed ${pagesCount} pages (${new Date().getTime() - startDate}ms)`);
+        }
+    }
 
 
     // Render pages
-    if (verbose) logger.info(``);
-    if (verbose) logger.info(`Rendering pages...`);
     let pagesRendered = 0;
     let pagesFailed = 0;
-    for (const page of pageDirectory.getPages()) {
-        if (await renderPage(page, pageDirectory)) {
-            pagesRendered++;
-        } else {
-            pagesFailed++;
-        } 
+    if (pagesCount > 0) {
+        logger.info(``);
+        logger.info(`Rendering pages...`);
+        for (const page of pageDirectory.getPages()) {
+            if (await renderPage(page, pageDirectory, options.viewsDir)) {
+                pagesRendered++;
+            } else {
+                pagesFailed++;
+            }
+        }
     }
 
     // Discover feeds
-    if (verbose) logger.info(``);
-    if (verbose) logger.info(`Discovering feeds...`);
-    const feeds = pageDirectory.getFeeds();
-    for (const feed of feeds) {
-        try {
-            let startDate = new Date().getTime();
-            await discoverFeed(feed, pageDirectory);
-            logger.info(`${feed.originalPath} => ${feed.outputPath} (${new Date().getTime() - startDate}ms)`)
-        } catch (e) {
-            logger.error(`Failed to discover feed ${feed.title}: ${e.message}`);
+    if (feedsCount > 0) {
+        logger.info(``);
+        logger.info(`Discovering feeds...`);
+        const feeds = pageDirectory.getFeeds();
+        for (const feed of feeds) {
+            try {
+                let startDate = new Date().getTime();
+                await discoverFeed(feed, pageDirectory);
+                logger.info(`${feed.originalPath} => ${feed.outputPath} (${new Date().getTime() - startDate}ms)`)
+            } catch (e) {
+                logger.error(`Failed to discover feed ${feed.title}: ${e.message}`);
+            }
         }
     }
 
 
     //TODO move to util
     const ensureParentDirExists = (file: string) => {
-        const joinedOutputPath = path.join(process.env.OUTPUT_DIR, file);
+        const joinedOutputPath = path.join(options.outputDir, file);
         const dir = path.dirname(joinedOutputPath);
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
@@ -70,11 +85,11 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
     };
 
     // Copy static files
-    if (verbose) logger.info(``);
-    if (verbose) logger.info(`Copying static files...`);
+    logger.info(``);
+    logger.info(`Copying static files...`);
     try {
         const files = glob.sync(`**/*`, { 
-            cwd: process.env.STATIC_DIR, 
+            cwd: options.staticDir, 
             nodir: true,
             ignore: ['**/*.scss', '**/*.css']
         })
@@ -82,7 +97,7 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
         for (const file of files) {
             let startDate = new Date().getTime();
             const outputPath = ensureParentDirExists(file);
-            const joinedPath = path.join(process.env.STATIC_DIR, file);
+            const joinedPath = path.join(options.staticDir, file);
             fs.copyFileSync(joinedPath, outputPath);
             logger.info(`${file} => /${file} (${new Date().getTime() - startDate}ms)`)
         }
@@ -93,17 +108,17 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
     
     // Process CSS files
     const cssFiles = glob.sync(`**/*.{css,scss}`, {
-        cwd: process.env.STATIC_DIR,
+        cwd: options.staticDir,
         nodir: true,
     });
     if (cssFiles.length > 0) {
-        if (verbose) logger.info(``);
-        if (verbose) logger.info(`Processing CSS files...`);
+        logger.info(``);
+        logger.info(`Processing CSS files...`);
 
         for (const file of cssFiles) {
             let startDate = new Date().getTime();
             const outputPath = ensureParentDirExists(file);
-            const joinedPath = path.join(process.env.STATIC_DIR, file);
+            const joinedPath = path.join(options.staticDir, file);
             let processedCss: string;
             try {
                 processedCss = await processCss(joinedPath);
@@ -121,11 +136,11 @@ export async function buildPages(verbose = true): Promise<{ success: boolean, er
     return { success: pagesFailed == 0, errors: pagesFailed, pageDirectory: pageDirectory};
 }
 
-async function renderPage(page: Page, pageDirectory: PageDirectory): Promise<boolean> {
+async function renderPage(page: Page, pageDirectory: PageDirectory, viewsDir: string): Promise<boolean> {
     let startDate = new Date().getTime();
     let html;
     try {
-        html = await render(page, pageDirectory);
+        html = await render(page, pageDirectory, viewsDir);
     } catch (e) {
         logger.error(`Failed to render page ${page.originalPath}: ${e.message}`);
         return false;
@@ -146,11 +161,11 @@ async function renderPage(page: Page, pageDirectory: PageDirectory): Promise<boo
     return true;
 }
 
-export async function rebuildSinglePage(path: string, pageDirectory: PageDirectory): Promise<boolean> {
+export async function rebuildSinglePage(path: string, pageDirectory: PageDirectory, options: Options): Promise<boolean> {
     const page = await pageDirectory.loadPage(path);
     if (!page) {
         return false;
     }
 
-    return await renderPage(page, pageDirectory);
+    return await renderPage(page, pageDirectory, options.viewsDir);
 }

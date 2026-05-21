@@ -46,13 +46,15 @@ function loadRaw(path: string): string {
 
 export class PageDirectory {
     private pagesPath: string;
+    private outputDir: string;
 
     private pages: Record<string, Page> = {};
     private feeds: Record<string, Feed> = {};
     private lastFullBuild: number;
 
-    constructor(pagesPath: string) {
+    constructor(pagesPath: string, outputDir: string) {
         this.pagesPath = pagesPath;
+        this.outputDir = outputDir;
 
         for (const page in this.pages) {
             delete this.pages[page];
@@ -77,7 +79,7 @@ export class PageDirectory {
         let originalPath = page;
         let fullPath = `${this.pagesPath}/${page}`;
         let outputPath = `${route}.html`
-        let buildPath = `${process.env.OUTPUT_DIR}/${outputPath}`;
+        let buildPath = `${this.outputDir}/${outputPath}`;
         let view = `${route}`;
         let raw: string;
         try {
@@ -120,7 +122,7 @@ export class PageDirectory {
             url: feed.url,
             originalPath: path,
             outputPath: `${feed.pages}/atom.xml`,
-            buildPath: `${process.env.OUTPUT_DIR}/${feed.pages}/atom.xml`,
+            buildPath: `${this.outputDir}/${feed.pages}/atom.xml`,
             paramStrategy: feed.paramStrategy,
             updated: new Date(0),
             entries: []

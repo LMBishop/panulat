@@ -4,7 +4,7 @@ import path from 'path';
 import buildInfo from "../config/info.js";
 import htmlMinify from 'html-minifier-terser';
 
-export async function render(page: Page, pageDirectory: PageDirectory): Promise<string> {
+export async function render(page: Page, pageDirectory: PageDirectory, viewsDir: string): Promise<string> {
     const options = {
         page: page,
         site: {
@@ -12,7 +12,7 @@ export async function render(page: Page, pageDirectory: PageDirectory): Promise<
         },
         build: buildInfo,
     };
-    const html = await ejs.renderFile(path.join(process.env.VIEWS_DIR, `${page.view}.ejs`), options);
+    const html = await ejs.renderFile(path.join(viewsDir, `${page.view}.ejs`), options);
     
     const minifiedHtml = await htmlMinify.minify(html, {
         collapseWhitespace: true,

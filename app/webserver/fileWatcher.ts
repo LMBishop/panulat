@@ -2,13 +2,14 @@ import chokidar, { FSWatcher } from 'chokidar';
 import { logger } from '../logger.js';
 import { PageDirectory } from '../builder/pageDirectory.js';
 import { buildPages, rebuildSinglePage } from '../builder/buildProject.js';
+import { Options } from '../options.js';
 import path from 'path';
 import fs from 'fs';
 
-function attachPageEvents(watcher: FSWatcher, pages: PageDirectory) {
+function attachPageEvents(watcher: FSWatcher, pages: PageDirectory, opts: Options) {
     const onPageChange = async (file: string) => {
         logger.info(`File ${file} has been modified, rebuilding...`);
-        if (await rebuildSinglePage(file, pages)) {
+        if (await rebuildSinglePage(file, pages, opts)) {
             logger.info(`...done`);
         }
         logger.info(``);
@@ -21,7 +22,7 @@ function attachPageEvents(watcher: FSWatcher, pages: PageDirectory) {
             logger.error(`Failed to find page for ${file}`);
             return;
         }
-        const joinedPath = path.join(process.env.OUTPUT_DIR, `${page.route}.html`);
+        const joinedPath = path.join(opts.outputDir, `${page.route}.html`);
         try {
             fs.rmSync(joinedPath)
         } catch (e) {
@@ -36,11 +37,11 @@ function attachPageEvents(watcher: FSWatcher, pages: PageDirectory) {
     watcher.on('unlink', onPageRemoval);
 }
 
-function attachStaticEvents(watcher: FSWatcher) {
+function attachStaticEvents(watcher: FSWatcher, opts: Options) {
     const onStaticChange = async (file: string) => {
         logger.info(`Static file ${file} has been modified, copying...`);
-        const joinedPath = path.join(process.env.STATIC_DIR, file);
-        const joinedOutputPath = path.join(process.env.OUTPUT_DIR, 'static', file);
+        const joinedPath = path.join(opts.staticDir, file);
+        const joinedOutputPath = path.join(opts.outputDir, 'static', file);
         try {
             fs.copyFileSync(joinedPath, joinedOutputPath);
             logger.info(`...done`);
@@ -52,7 +53,7 @@ function attachStaticEvents(watcher: FSWatcher) {
 
     const onStaticRemoval = (file: string) => {
         logger.info(`Static file ${file} has been removed, deleting...`);
-        const joinedOutputPath = path.join(process.env.OUTPUT_DIR, 'static', file);
+        const joinedOutputPath = path.join(opts.outputDir, 'static', file);
         try {
             fs.rmSync(joinedOutputPath)
             logger.info(`...done`);
@@ -67,14 +68,14 @@ function attachStaticEvents(watcher: FSWatcher) {
     watcher.on('unlink', onStaticRemoval);
 }
 
-function attachViewEvents(watcher: FSWatcher, pages: PageDirectory) {
+function attachViewEvents(watcher: FSWatcher, pages: PageDirectory, opts: Options) {
     const onViewChange = async (file: string) => {
         logger.info(`View ${file} has been modified, rebuilding pages with view...`);
         let pagesWithView = pages.getPages().filter(page => `${page.view}.ejs` === file);
         logger.info(`Found ${pagesWithView.length} pages with view ${file}`);
         for (const page of pagesWithView) {
             logger.info(`Rebuilding page ${page.route}...`);
-            if (await rebuildSinglePage(page.originalPath, pages)) {
+            if (await rebuildSinglePage(page.originalPath, pages, opts)) {
                 logger.info(`...done`);
             }
         }
@@ -94,7 +95,7 @@ function attachViewEvents(watcher: FSWatcher, pages: PageDirectory) {
 
 let buildInProgress = false;
 
-function attachFullRebuildEvents(watcher: FSWatcher) {
+function attachFullRebuildEvents(watcher: FSWatcher, opts: Options) {
     
     const onFullRebuild = async (file: string) => {
         if (buildInProgress) {
@@ -105,7 +106,7 @@ function attachFullRebuildEvents(watcher: FSWatcher) {
         
         logger.info(`File ${file} has been modified, starting full rebuild...`);
         const startDate = new Date();
-        const {success, errors, pageDirectory} = await buildPages(false);
+        const {success, errors, pageDirectory} = await buildPages(opts);
         const endDate = new Date();
         const finishString = `...done${errors > 0 ? `, with ${errors} errors` : ''}, after ${endDate.getTime() - startDate.getTime()}ms.`; 
         if (!success) {
@@ -122,30 +123,30 @@ function attachFullRebuildEvents(watcher: FSWatcher) {
     watcher.on('unlink', onFullRebuild);
 }
 
-export const start = (pages: PageDirectory) => {
+export const start = (pages: PageDirectory, opts: Options) => {
     const pagesWatcher = chokidar.watch('.', {
         persistent: true,
-        cwd: process.env.PAGES_DIR,
+        cwd: opts.pagesDir,
         ignoreInitial: true,
     });
     const staticWatcher = chokidar.watch('.', {
         persistent: true,
-        cwd: process.env.STATIC_DIR,
+        cwd: opts.staticDir,
         ignoreInitial: true,
     });
     const viewsWatcher = chokidar.watch('.', {
         persistent: true,
-        cwd: process.env.VIEWS_DIR,
+        cwd: opts.viewsDir,
         ignoreInitial: true,
     });
 
-    // attachPageEvents(pagesWatcher, pages);
-    // attachStaticEvents(staticWatcher);
-    // attachViewEvents(viewsWatcher, pages);
+    // attachPageEvents(pagesWatcher, pages, opts);
+    // attachStaticEvents(staticWatcher, opts);
+    // attachViewEvents(viewsWatcher, pages, opts);
     // 
-    attachFullRebuildEvents(pagesWatcher);
-    attachFullRebuildEvents(staticWatcher);
-    attachFullRebuildEvents(viewsWatcher);
+    attachFullRebuildEvents(pagesWatcher, opts);
+    attachFullRebuildEvents(staticWatcher, opts);
+    attachFullRebuildEvents(viewsWatcher, opts);
     
     const exitHandler = () => {
         logger.info(`Stopping file watcher...`);

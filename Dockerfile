@@ -20,6 +20,8 @@ LABEL org.opencontainers.image.source=https://github.com/LMBishop/panulat
 
 WORKDIR /app
 
+COPY entrypoint.sh .
+
 COPY --chown=node:node package*.json ./
 
 RUN npm i --production
@@ -28,4 +30,4 @@ COPY --chown=node:node --from=build /app/dist dist
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+ENTRYPOINT [ "./entrypoint.sh" ]

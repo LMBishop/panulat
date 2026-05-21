@@ -2,22 +2,23 @@ import express from 'express';
 import { logger } from '../logger.js';
 import { AddressInfo } from 'net';
 import { PageDirectory } from '../builder/pageDirectory.js';
+import { Options } from '../options.js';
 
 const app = express();
 
-app.use(express.static(process.env.OUTPUT_DIR, { extensions: ['html'] }));
+export const start = (pages: PageDirectory, opts: Options) => {
+    app.use(express.static(opts.outputDir, { extensions: ['html'] }));
 
-export const start = (pages: PageDirectory) => {
-    const server = app.listen(process.env.WEBSERVER_PORT, () => {
+    const server = app.listen(opts.webserverPort, () => {
         const address = server.address() as AddressInfo;
-        logger.info(`Serving files from: ${process.env.OUTPUT_DIR}`);
+        logger.info(`Serving files from: ${opts.outputDir}`);
         logger.info(`           Address: http://localhost:${address.port}`);
         logger.info(`                    ^C to stop`);
         logger.info('')
         
-        if (process.env.WEBSERVER_AUTOREBUILD === 'true') {
+        if (opts.webserverAutorebuild) {
             import('./fileWatcher.js').then((watcher) => {
-                watcher.start(pages);
+                watcher.start(pages, opts);
             });
         }
     });
