@@ -13,6 +13,46 @@ import YAML from 'yaml'
 hljsDefineSolidity(hljs);
 hljs.initHighlightingOnLoad();
 
+// https://marked.js.org/using_pro#extensions
+// TODO move parsinmg to its own file
+const descriptionList = {
+    name: 'descriptionList',
+    level: 'block',
+
+    start(src) {
+        return src.match(/^[^\n]+\n: /m)?.index;
+    },
+
+    tokenizer(src) {
+        const rule = /^([^\n]+)\n((?:: .*(?:\n|$))+)/;
+        const match = rule.exec(src);
+        if (!match) return;
+
+        const term = match[1].trim();
+        const definitions = match[2]
+            .trim()
+            .split('\n')
+            .map(line => line.replace(/^: /, '').trim());
+
+        return {
+            type: 'descriptionList',
+            raw: match[0],
+            term: this.lexer.inlineTokens(term),
+            definitions: definitions.map(def => this.lexer.inlineTokens(def))
+        };
+    },
+
+    renderer(token) {
+        const dt = `<dt>${this.parser.parseInline(token.term)}</dt>`;
+        const dds = token.definitions .map(def => `<dd>${this.parser.parseInline(def)}</dd>` ) .join('\n');
+        return `<dl>\n${dt}\n${dds}\n</dl>`;
+    },
+
+    childTokens: ['term', 'definitions']
+};
+
+marked.use({ extensions: [descriptionList] });
+
 marked.use(gfmHeadingId());
 marked.use(markedHighlight({
     emptyLangClass: 'hljs',
