@@ -3,12 +3,23 @@ import fs from "fs";
 import { Feed, PageDirectory } from "./pageDirectory.js";
 import { logger } from "../logger.js";
 
+function getBaseUrl(feedUrl: string): string {
+    const parsed = new URL(feedUrl);
+    return `${parsed.protocol}//${parsed.host}`;
+}
+
+function resolveRelativeUrls(html: string, baseUrl: string): string {
+    return html.replace(/(src|href)=["']\/([^\/"'\s]+[^"']*)["']/gi, (match, attr, path) => {
+        return `${attr}="${baseUrl}/${path}"`;
+    });
+}
+
 export async function discoverFeed(feed: Feed, pageDirectory: PageDirectory): Promise<boolean> {
     const entries = [];
 
     const titleConfigPath = feed.paramStrategy?.title?.from || "title";
     const updatedConfigPath = feed.paramStrategy?.date?.from || "date";
-    const descriptionConfigPath = feed.paramStrategy?.description?.from || "description";
+    const baseUrl = getBaseUrl(feed.url);
     //todo support actual discovery strategies 
 
     for (const page of pageDirectory.getPagesBeginningWith(feed.route)) {
@@ -20,8 +31,7 @@ export async function discoverFeed(feed: Feed, pageDirectory: PageDirectory): Pr
             updated: page.config[updatedConfigPath] || new Date(0),
             id: page.name,
             url: `${feed.url}/${page.name}`,
-            description: page.config[descriptionConfigPath] || "",
-            content: page.html || "",
+            content: resolveRelativeUrls(page.html || "", baseUrl),
         };
         entries.push(entry);
     }
@@ -47,7 +57,6 @@ ${feed.entries
 <updated>${entry.updated.toISOString()}</updated>
 <id>${entry.id}</id>
 <link rel="alternate" href="${entry.url}" type="text/html"/>
-<summary>${entry.description}</summary>
 <content type="text/html"><![CDATA[${entry.content}]]></content>
 </entry>`;
         })

@@ -189,6 +189,5 @@ export type FeedEntry = {
     updated: Date;
     id: string;
     url: string;
-    description: string;
     content: string;
 }
