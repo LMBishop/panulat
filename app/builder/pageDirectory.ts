@@ -62,14 +62,26 @@ marked.use(markedHighlight({
         return hljs.highlight(code, { language }).value;
     }
 }));
+marked.use(markedFootnote());
+
+// https://github.com/markedjs/marked/discussions/2982
+marked.use({
+    renderer: {
+        link(href, title, text) {
+            const link = marked.Renderer.prototype.link.call(this, href, title, text);
+            if (/href=['"]https?:\/\//g.test(link)) {
+                return link.replace("<a","<a target='_blank' rel='noreferrer' ");
+            }
+            return link
+        }
+    }
+})
 
 export async function parsePage(page: Page) {
     try {
         const frontmatter = matter(page.raw);
         const config = frontmatter.data;
-        const html = marked
-            .use(markedFootnote())
-            .parse(frontmatter.content, { mangle: false });
+        const html = marked.parse(frontmatter.content, { mangle: false });
 
         page.html = html;
         page.config = config;
